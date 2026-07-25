@@ -424,6 +424,12 @@
         <button class="btn ghost small" onclick="exitDashboard()">← 게임 화면으로</button>
       </div>
     </div>
+    <div class="card">
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <label for="banFilter" style="font-weight:700; font-size:15px; margin:0;">반 선택</label>
+        <select id="banFilter" style="max-width:240px;" onchange="applyBanFilter()"></select>
+      </div>
+    </div>
     <div class="card" id="dashStats"></div>
     <div class="card">
       <h3 style="font-size:16px; margin-bottom:12px;">결정 포인트별 선택 분포</h3>
@@ -1080,7 +1086,9 @@ async function enterDashboard(){
   try{
     const res = await fetch(`${CONFIG.SHEET_WEBAPP_URL}?token=${encodeURIComponent(CONFIG.TEACHER_PASSWORD)}&game=${encodeURIComponent(CONFIG.GAME_NAME)}`);
     const rows = await res.json();
-    renderDashboard(rows.rows || rows);
+    dashAllRows = rows.rows || rows;
+    buildBanFilter(dashAllRows);
+    applyBanFilter();
   }catch(err){
     document.getElementById('dashStats').innerHTML = '<p class="small">⚠ 데이터를 불러오지 못했어요.</p>';
   }
@@ -1143,6 +1151,41 @@ function exitDashboard(){
   }
   if(name) document.getElementById('studentName').value = name;
 })();
+
+  /* =========================================================
+   반별 필터 (v2.1 추가)
+   학번 5자리 고정 형식: 학년(1) + 반(2) + 번호(2), 예: 20315
+   ========================================================= */
+let dashAllRows = [];
+
+function banKeyOf(r){
+  const sid = String(r.studentId || '').trim();
+  return /^\d{5}$/.test(sid) ? sid.slice(0, 3) : 'etc';  // '203' = 2학년 3반
+}
+
+function banLabelOf(key){
+  if(key === 'etc') return '학번 형식 오류';
+  return key[0] + '학년 ' + Number(key.slice(1)) + '반';
+}
+
+function buildBanFilter(rows){
+  const sel = document.getElementById('banFilter');
+  const keys = [...new Set(rows.map(banKeyOf))].sort();
+  sel.innerHTML = '<option value="all">전체 반 (' + rows.length + '명)</option>';
+  keys.forEach(k => {
+    const count = rows.filter(r => banKeyOf(r) === k).length;
+    sel.insertAdjacentHTML('beforeend',
+      '<option value="' + k + '">' + banLabelOf(k) + ' (' + count + '명)</option>');
+  });
+}
+
+function applyBanFilter(){
+  const v = document.getElementById('banFilter').value;
+  const filtered = (v === 'all') ? dashAllRows.slice()
+                                 : dashAllRows.filter(r => banKeyOf(r) === v);
+  filtered.sort((a, b) => String(a.studentId).localeCompare(String(b.studentId)));
+  renderDashboard(filtered);
+}
   
 </script>
 </body>
