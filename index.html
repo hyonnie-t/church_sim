@@ -94,23 +94,7 @@
   .id-row{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; }
   @media (max-width:520px){ .id-row{grid-template-columns:1fr;} }
 
-  .side-select{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:18px 0 6px; }
-  @media (max-width:560px){ .side-select{grid-template-columns:1fr;} }
-  .side-btn{
-    cursor:pointer; border-radius:16px; border:2.5px solid var(--line);
-    background:#fffefb; padding:22px 18px; text-align:left; min-height:70px;
-    transition:.15s;
-  }
-  .side-btn:hover{ transform:translateY(-2px); box-shadow:var(--shadow); }
-  .side-btn.selected{ box-shadow:var(--shadow-lg); }
-  .side-btn.christian.selected{ border-color:var(--gold); background:#FFF6E0; }
-  .side-btn.islam.selected{ border-color:var(--islamic); background:#E4F7EE; }
-  .side-btn .name{ font-family:'Nanum Myeongjo',serif; font-weight:800; font-size:20px; display:block; margin-bottom:5px; }
-  .side-btn.christian .name{ color:var(--gold-deep); }
-  .side-btn.islam .name{ color:var(--islamic-deep); }
-  .side-btn .desc{ font-size:14px; color:var(--ink-soft); }
-
-  .btn, .option, .side-btn{
+  .btn, .option{
     touch-action:manipulation; -webkit-tap-highlight-color:transparent;
     user-select:none; -webkit-user-select:none;
   }
@@ -284,6 +268,78 @@
   table.subtable{ width:100%; border-collapse:collapse; font-size:14.5px; }
   table.subtable th, table.subtable td{ text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); }
   table.subtable th{ color:var(--ink-soft); font-weight:700; font-size:13px; }
+
+  /* ===== 관점 전환형 추가 스타일 ===== */
+  /* 연대기 리본 */
+  .chrono{ display:flex; align-items:center; gap:0; margin:6px 0 20px; overflow-x:auto; scrollbar-width:none; padding-bottom:4px; }
+  .chrono::-webkit-scrollbar{ display:none; }
+  .chr-node{ display:flex; flex-direction:column; align-items:center; min-width:66px; flex:1; position:relative; }
+  .chr-dot{ width:14px; height:14px; border-radius:50%; background:var(--paper); border:2.5px solid var(--line); z-index:1; transition:.4s; }
+  .chr-node::before{ content:''; position:absolute; top:6px; left:-50%; width:100%; height:2.5px; background:var(--line); z-index:0; }
+  .chr-node:first-child::before{ display:none; }
+  .chr-node.done .chr-dot{ background:var(--gold); border-color:var(--gold-deep); }
+  .chr-node.now .chr-dot{ background:var(--accent); border-color:var(--accent-deep); box-shadow:0 0 0 4px rgba(124,77,255,.2); transform:scale(1.15); }
+  .chr-node.done::before, .chr-node.now::before{ background:var(--gold); }
+  .chr-year{ font-size:12px; color:var(--ink-soft); margin-top:5px; white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .chr-node.now .chr-year{ color:var(--accent-deep); font-weight:800; }
+
+  .map-panel h3{ display:flex; justify-content:space-between; align-items:center; }
+  .map-year-tag{ font-family:'Nanum Myeongjo',serif; font-weight:800; font-size:16px; color:var(--ink); }
+
+  .tag.decision{ background:#E9E3F5; color:var(--accent-deep); }
+  .tag.event{ background:#F0E6CF; color:var(--gold-deep); }
+  .card.event-card{ background:linear-gradient(180deg, #FBF7EC, #F8F2E2); border-left:6px solid var(--gold); }
+
+  .context p{ margin:0 0 .5em; }
+
+  /* 용어 밑줄 */
+  .term{ border-bottom:2px dotted var(--gold-deep); cursor:pointer; font-weight:600; color:var(--gold-deep); }
+  .term:active{ background:#F6E6BC; }
+
+  /* 선택지 기대/위험 (원본 opt-meta 재사용) */
+  .opt-meta b.pro{ background:#E1F1E4; color:#2E7D46; }
+  .opt-meta b.con{ background:#FBE3E1; color:#B4362E; }
+
+  /* 결과 박스 변형 */
+  .result-box{ border:1.8px solid; border-radius:14px; padding:15px 17px; margin-top:12px; animation:cardIn .4s ease; }
+  .result-box.real{ background:#EEF3E4; border-color:#7C9A5B; }
+  .result-box.virtual{ background:#FBEAE6; border-color:var(--danger); }
+  .result-box.actual{ background:#F6F1E2; border-color:var(--gold); }
+  .result-box .flag{ font-size:13px; font-weight:800; margin-bottom:6px; display:inline-flex; align-items:center; gap:7px; }
+  .result-box.real .flag{ color:#4E7A2E; }
+  .result-box.virtual .flag{ color:var(--danger); }
+  .result-box.actual .flag{ color:var(--gold-deep); }
+  .badge-pill{ font-size:11px; font-weight:800; padding:2.5px 9px; border-radius:999px; color:#fff; }
+  .badge-pill.v{ background:var(--danger); }
+  .badge-pill.m{ background:#5F7D4E; }
+
+  .bubble.alt{ stroke:#B4362E !important; stroke-width:3 !important; stroke-dasharray:5 4; }
+
+  /* 브리지 엔딩 */
+  .bridge{ margin:18px 0; padding:20px 18px; text-align:center; border-top:2.5px solid var(--gold); border-bottom:2.5px solid var(--gold); background:linear-gradient(180deg,#FAF3E0,#F4ECD9); }
+  .bridge .q{ font-family:'Nanum Myeongjo',serif; font-size:1.35rem; font-weight:800; line-height:1.5; }
+  .bridge .q-sub{ font-size:.94rem; color:var(--ink-soft); margin-top:8px; }
+
+  /* 비교 테이블 */
+  .compare-table{ width:100%; border-collapse:collapse; margin:6px 0; font-size:14.5px; }
+  .compare-table th{ background:var(--paper-deep); border:1.5px solid var(--line); padding:8px 6px; font-size:13px; color:var(--ink-soft); }
+  .compare-table td{ border:1.5px solid var(--line); padding:9px 8px; vertical-align:top; background:#fff; }
+  .compare-table td.match{ color:#3E6B32; font-weight:700; text-align:center; }
+  .compare-table td.mism{ color:#A03E2F; font-weight:700; text-align:center; }
+
+  .btn.gold{ background:var(--gold-deep); }
+  .btn.gold:hover{ background:#9c6716; }
+
+  /* 용어 바텀시트 */
+  .sheet-backdrop{ position:fixed; inset:0; background:rgba(46,42,56,.4); display:none; align-items:flex-end; justify-content:center; z-index:60; }
+  .sheet-backdrop.open{ display:flex; }
+  .sheet{ background:var(--card); width:100%; max-width:560px; border-radius:20px 20px 0 0; border:2px solid var(--line); border-bottom:none; padding:22px 22px 32px; animation:sheetUp .26s ease; box-shadow:0 -6px 24px rgba(46,42,56,.25); }
+  @keyframes sheetUp{ from{transform:translateY(40px);opacity:0;} to{transform:none;opacity:1;} }
+  .sheet h3{ font-size:1.15rem; margin-bottom:6px; color:var(--gold-deep); }
+  .sheet p{ font-size:1rem; color:var(--ink); }
+  .sheet .close-x{ margin-top:16px; width:100%; border:2px solid var(--line); background:#fff; border-radius:11px; padding:12px; font-size:1rem; font-weight:700; color:var(--ink-soft); cursor:pointer; }
+
+  @media(prefers-reduced-motion:reduce){ *{ animation:none !important; } }
 </style>
 </head>
 <body>
@@ -292,22 +348,22 @@
   <header class="top">
     <div>
       <div class="eyebrow">2학년 세계사 · 크리스트교와 이슬람 세계</div>
-      <h1>세력권 전략 시뮬레이션</h1>
+      <h1>세력권 연대기</h1>
     </div>
-    <span class="badge" id="sideBadge">진영 미선택</span>
+    <span class="badge" id="topBadge">476 – 1095</span>
   </header>
 
   <!-- SETUP -->
   <div id="screen-setup">
     <div class="banner">
-      <strong>이 게임의 사건들은 모두 실제 역사예요.</strong> 여러분은 한 진영의 결정권자들이 되어,
-      갈림길 4곳에서 <strong>실제 역사의 선택</strong>과 <strong>"만약"의 선택</strong> 중 하나를 고릅니다.
-      상대 진영의 일에는 여러분 손이 닿지 않아요 — 실제 역사 그대로 <strong>전령의 소식</strong>으로 전해집니다.
-      끝나면 내가 만든 지도와 실제 역사 지도를 나란히 비교해요.
+      <strong>역사의 갈림길에 서 볼래?</strong> 게르만 왕국의 왕, 아바스의 칼리프, 로마의 교황, 셀주크의 술탄 —
+      카드마다 <strong>다른 인물이 되어</strong> 그 시대의 선택을 직접 내려 봐요.
+      <strong>정답은 없어요.</strong> 점수도 없고, 네 선택의 결과와 실제 역사를 나란히 보여줄 뿐이에요.
+      마지막에 <strong>"왜 그렇게 판단했는지"</strong> 쓰는 게 진짜 미션! 밑줄 친 낱말을 누르면 뜻이 나와요.
     </div>
 
     <div class="card">
-      <h2 style="font-size:19px; margin-bottom:14px;">① 내 정보 입력</h2>
+      <h2 style="font-size:19px; margin-bottom:14px;">내 정보 입력</h2>
       <div class="id-row">
         <div class="field">
           <label for="grade">학년</label>
@@ -331,40 +387,23 @@
         <label for="studentName">이름</label>
         <input type="text" id="studentName" placeholder="예: 홍길동">
       </div>
-    </div>
-
-    <div class="card">
-      <h2 style="font-size:19px;">② 진영 선택</h2>
-      <p class="small">고른 진영의 갈림길 4곳에서 직접 선택하고, 반대 진영의 4곳은 실제 역사 그대로 진행돼요.</p>
-      <div class="side-select">
-        <div class="side-btn christian" id="btnChristian" onclick="selectSide('christian')">
-          <span class="name">크리스트교 세계</span>
-          <span class="desc">⛪ 프랑크 왕국의 왕, 재상 카롤루스 마르텔, 로마 교황이 되어 4개의 갈림길을 결정합니다.</span>
-        </div>
-        <div class="side-btn islam" id="btnIslam" onclick="selectSide('islam')">
-          <span class="name">이슬람 세계</span>
-          <span class="desc">🕌 우마이야·아바스 왕조의 칼리프, 셀주크의 술탄, 이슬람 상인이 되어 4개의 갈림길을 결정합니다.</span>
-        </div>
-      </div>
       <div class="actions">
-        <button class="btn" id="startBtn" onclick="startGame()" disabled>시뮬레이션 시작</button>
+        <button class="btn" id="startBtn" onclick="startGame()">연대기 시작하기</button>
       </div>
     </div>
   </div>
 
   <!-- PLAY -->
   <div id="screen-play" class="hidden">
-    <div class="progress" id="progressBar"></div>
-
+    <div class="chrono" id="chrono"></div>
     <div class="play-grid">
       <div class="map-panel">
-        <h3>현재 세력권 지도</h3>
+        <h3><span>현재 세력권 지도</span><span class="map-year-tag" id="mapYearTag">476년</span></h3>
         <svg class="gamemap" id="mapSvg" viewBox="0 0 800 520" xmlns="http://www.w3.org/2000/svg"></svg>
         <div class="legend" id="legend"></div>
-        <h3 style="margin-top:14px;">세력 판도</h3>
+        <h3 style="margin-top:14px;"><span>세력 판도</span></h3>
         <div class="gauge" id="gauge"></div>
       </div>
-
       <div class="card" id="stepCard"></div>
     </div>
   </div>
@@ -372,8 +411,18 @@
   <!-- SUMMARY -->
   <div id="screen-summary" class="hidden">
     <div class="card">
-      <h2 style="font-size:20px; margin-bottom:6px;">게임 종료 — 지도 비교</h2>
-      <p class="small">내가 만든 지도와 실제 역사 지도를 비교해 보세요. 다른 지역이 있다면, 왜 실제 역사는 그렇게 됐을지 생각해봐요.</p>
+      <span class="tag event">📜 연대기의 끝 · 1095</span>
+      <h2 style="font-size:22px; margin-bottom:4px;">십자군 전쟁이 시작된다</h2>
+      <p class="small">620년 동안 네가 서 본 갈림길들이, 결국 이 순간으로 이어졌어요.</p>
+      <div class="bridge">
+        <div class="q">그런데 — 교황은 왜<br>전 유럽을 움직일 수 있었을까?</div>
+        <div class="q-sub">황제도 왕도 아닌 교황의 말 한마디에, 왕부터 농민까지 움직였어요. 이게 오늘 수업의 질문이에요.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:19px; margin-bottom:6px;">내가 만든 지도 vs 실제 역사</h2>
+      <p class="small">다른 지역이 있다면, 왜 실제 역사는 그렇게 됐을지 생각해봐요.</p>
       <div class="maps-compare" style="margin-top:16px;">
         <div>
           <h3 style="font-size:13.5px; color:var(--ink-soft); margin-bottom:8px;">내가 만든 지도</h3>
@@ -388,21 +437,23 @@
     </div>
 
     <div class="card">
-      <h3 style="font-size:17px; margin-bottom:10px;">차이가 나는 지점</h3>
-      <div id="diffList"></div>
+      <h3 style="font-size:17px; margin-bottom:10px;">내 선택 돌아보기</h3>
+      <table class="compare-table" id="reviewTable"></table>
+      <p class="small" style="margin-top:8px;">※ '다름'은 틀렸다는 뜻이 아니에요. 네 판단의 이유가 중요해요.</p>
     </div>
 
     <div class="card">
-      <h3 style="font-size:17px; margin-bottom:6px;">가장 고민됐던 갈림길</h3>
-      <p class="small" style="margin-bottom:10px;">직접 선택한 갈림길 4곳 중 가장 고민됐던 곳을 하나 고르고, 왜 그 선택을 했는지 한두 문장으로 써줘. (자세한 이야기는 이어지는 패들렛 활동에서 써요)</p>
+      <h3 style="font-size:17px; margin-bottom:6px;">✍️ 마지막 미션 — 판단의 이유 쓰기</h3>
+      <p class="small" style="margin-bottom:10px;">직접 선택한 갈림길 중 가장 고민됐던 곳을 하나 고르고, 왜 그 선택을 했는지 써줘. 실제 역사와 달랐다면, 실제 역사는 왜 그 길로 갔을지도 함께 생각해 보고. (자세한 이야기는 이어지는 패들렛 활동에서 써요)</p>
       <div class="field">
         <select id="hardestPoint"></select>
       </div>
-      <textarea id="reflection" placeholder="예: 후퇴하면 군대는 지킬 수 있지만 서유럽을 내주게 될 것 같아서, 위험해도 맞서 싸우는 쪽을 골랐다."></textarea>
+      <textarea id="reflection" placeholder="예: 교황이 카롤루스를 임명하면 비잔티움과 갈라서게 되지만, 서유럽에 교회를 지켜줄 힘이 필요하다고 판단해서 임명하는 쪽을 골랐다."></textarea>
+      <div class="small" style="margin-top:4px;"><span id="charCount">0</span>자 (최소 <span id="minChar"></span>자)</div>
     </div>
 
     <div class="actions">
-      <button class="btn" id="submitBtn" onclick="submitResult()">결과 제출하기</button>
+      <button class="btn" id="submitBtn" onclick="submitResult()" disabled>결과 제출하기</button>
     </div>
     <div id="submitStatus" class="small center" style="margin-top:10px;"></div>
   </div>
@@ -413,6 +464,9 @@
       <h2 style="margin-bottom:10px;">제출 완료!</h2>
       <p>수고했어요. 선생님께 여러분의 선택과 생각이 전달됐어요.</p>
       <p class="small" style="margin-top:8px;">이제 이어지는 패들렛 글쓰기에서 오늘 느낀 점을 조금 더 풀어서 써 봐요.</p>
+      <div class="actions" style="justify-content:center; margin-top:20px;">
+        <button class="btn gold" onclick="goPortal()">← 학습 포털로 돌아가기</button>
+      </div>
     </div>
   </div>
 
@@ -442,7 +496,8 @@
   </div>
 
   <footer class="foot">
-    2학년 세계사 · 크리스트교 단원 3차시 · 세력권 전략 시뮬레이션 ·
+    2학년 세계사 · 크리스트교 단원 3차시 · 세력권 연대기 ·
+    <button class="foot-link" onclick="goPortal()">학습 포털로</button> ·
     <button class="foot-link" onclick="openTeacherGate()">교사용 대시보드</button>
   </footer>
 </div>
@@ -459,6 +514,15 @@
     </div>
   </div>
 </div>
+
+<!-- 용어 바텀시트 -->
+<div class="sheet-backdrop" id="sheetBack" onclick="if(event.target===this)closeSheet()">
+  <div class="sheet">
+    <h3 id="sheetTitle"></h3>
+    <p id="sheetBody"></p>
+    <button class="close-x" onclick="closeSheet()">닫기</button>
+  </div>
+</div>
   
 <script>
 /* =========================================================
@@ -468,6 +532,8 @@ const CONFIG = {
   SHEET_WEBAPP_URL: "https://script.google.com/macros/s/AKfycbyXSjCfWY_HiZFqW_OBR-FQDoIfF1z_STqyKWUI31MacHeY3u7hbirFSFDvW-5yuUHaJQ/exec",       // Apps Script 배포 후 웹앱 URL을 넣으세요 (마스터 시트 하나에 여러 게임이 배포 URL을 공유)
   TEACHER_PASSWORD: "his26", // 교사용 화면 진입 비밀번호 (화면단 보호 — 원할 시 자유롭게 바꾸세요)
   GAME_NAME: "세력권전략시뮬레이션", // 마스터 시트 "게임명" 컬럼에 들어가는 고정값 — 게임마다 다르게 설정
+  PORTAL_URL: "https://hyonnie-t.github.io/history26/", // 학습 포털 복귀 주소 (학번·이름을 붙여 자동 로그인)
+  MIN_REFLECTION: 20, // 성찰 최소 글자 수
 };
 
 /* =========================================================
@@ -483,131 +549,109 @@ const CONTROL_COLOR = {
 };
 const CONTROL_LABEL = {
   neutral:'미정', catholic:'로마 가톨릭권', orthodox:'그리스 정교권',
-  islamic:'이슬람권', pagan:'게르만 토속신앙권(가상)', arian:'아리우스파권(가상)'
+  islamic:'이슬람권', pagan:'게르만 토속신앙권', arian:'아리우스파권'
 };
 
 /* =========================================================
-   배경 사실 (선택 대상 아님)
+   용어 사전 — 카드 본문의 {용어}에 밑줄, 탭하면 뜻 팝업
    ========================================================= */
-const BACKGROUNDS = [
-  {
-    before:'p2',
-    text:'7세기 이후 이슬람 세력은 북아프리카와 서아시아 대부분으로 빠르게 확장했어요.',
-    effects:[ {region:'africa', control:'islamic', strength:1}, {region:'levant', control:'islamic', strength:1} ]
-  }
-];
+const TERMS = {
+  '게르만족':'로마 제국 북쪽에서 수렵·목축·농업을 하며 살던 여러 종족을 통틀어 부르는 말이야.',
+  '토속 신앙':'한 지역에서 옛날부터 믿어 온 고유의 신앙. 게르만족은 다양한 토속 신앙을 믿고 있었어.',
+  '교황':'로마 교회(가톨릭)의 최고 지도자. 로마 주교의 권위가 커지면서 교황이 됐어.',
+  '비잔티움 제국':'동로마 제국. 서로마가 멸망한 뒤에도 1000년 동안 이어진 나라야. 수도는 콘스탄티노폴리스.',
+  '우마이야 왕조':'초기 이슬람 왕조. 북아프리카를 지나 이베리아반도까지 세력을 넓혔어.',
+  '이베리아반도':'지금의 에스파냐(스페인)·포르투갈이 있는, 유럽 남서쪽 끝의 반도야.',
+  '재상':'왕을 돕는 관리 중 최고 책임자.',
+  '성상':'예수·성모·성인의 모습을 그리거나 새긴 것. 글을 모르는 사람들에게 교리를 전할 때 중요했어.',
+  '칼리프':'이슬람 세계의 최고 지도자.',
+  '술탄':'칼리프를 대신해 정치권력을 행사한 지배자. 셀주크 튀르크가 처음 이 칭호를 받았어.',
+  '아바스 왕조':'750년에 우마이야 왕조를 무너뜨리고 들어선 이슬람 왕조. 수도는 바그다드.',
+  '셀주크 튀르크':'중앙아시아에서 서아시아로 이동해 온 튀르크 계통의 세력. 이슬람교를 받아들였어.',
+  '소아시아':'지금의 튀르키예가 있는 반도. 당시엔 비잔티움 제국의 땅이었어.',
+  '비아랍인':'아랍인이 아닌 사람들. 페르시아인 등 이슬람교를 믿는 다양한 민족이 있었어.',
+  '성지':'종교에서 신성하게 여기는 장소. 예루살렘은 유대교·크리스트교·이슬람교 모두의 성지야.'
+};
 
 /* =========================================================
-   결정 포인트 (시대순, 크리스트교 4 · 이슬람 4)
-   role: 사건별 역할 배지 / pro·con: 당대 관점의 기대와 위험 (가상 선택지의 논거는 창작)
+   시나리오 (관점 전환형 단일 흐름, 시대순 476→1095)
+   type:'decision' = 직접 선택 / type:'event' = 선택 없는 사건(내레이션+지도변화)
+   결정 카드: 어느 선택도 오답 아님. real:true = 실제 역사 노선(보상 없음, 비교용)
+   effect.control = 지도에서 해당 거점이 바뀌는 세력
    ========================================================= */
 const POINTS = [
-  { id:'p1', side:'christian', year:'4~5세기', title:'게르만 왕국들의 개종', region:'franks',
-    role:{icon:'👑', text:'당신은 프랑크 왕국의 왕입니다'},
-    context:'서로마 제국이 무너진 자리에 여러 게르만 왕국이 들어섰어요. 그중 프랑크 왕국은 어떤 길을 택할까요?',
-    sourceNote:'교과서에서 확인(주제13): 프랑크 왕국은 로마 문화와 크리스트교를 일찍 받아들이며 다른 게르만 왕국들을 앞질러 성장했다.',
+  { id:'p1', type:'decision', year:'5세기', title:'무너진 제국, 새 왕국의 왕', region:'franks', mapYear:'5세기',
+    role:{icon:'👑', text:'너는 게르만 왕국의 왕이다'},
+    context:'서로마 제국이 무너졌다(476). 네 왕국 안에는 크리스트교를 믿는 로마계 주민이 많고, 교회는 도시와 마을을 지키는 중심이다. 하지만 너의 부족은 오랫동안 {토속 신앙}을 믿어 왔다.',
+    sourceNote:'교과서 근거(주제13): 프랑크 왕국은 로마 문화와 크리스트교를 일찍 받아들여 다른 게르만 왕국들을 앞질러 성장했다.',
     options:[
-      { label:'로마 가톨릭을 받아들이고 로마 문화와 결합한다', real:true, effect:{control:'catholic', strength:2},
-        pro:'로마 교회와 로마계 주민의 지지를 얻는다', con:'게르만 전통을 따르는 세력이 반발할 수 있다',
-        result:'로마 교회와 손을 잡으며 서유럽에서 세력을 넓힐 발판을 마련했다.' },
-      { label:'게르만 고유의 토속 신앙을 지킨다', real:false, effect:{control:'pagan', strength:1},
-        pro:'게르만 부족들의 결속과 전통을 지킨다', con:'로마 교회와 로마계 주민의 협조를 얻기 어렵다',
-        result:'로마 교회의 지원을 받지 못해 다른 게르만 왕국들과 큰 차이가 없어졌다.' },
-      { label:'아리우스파 크리스트교를 받아들인다', real:false, effect:{control:'arian', strength:1},
-        pro:'아리우스파를 믿는 다른 게르만 왕국들과 가까워진다', con:'로마 교회와는 거리가 생긴다',
-        result:'일부 게르만 왕국이 실제로 택했던 비주류 교파를 받아들여 로마 교회와는 거리가 생겼다.' }
+      { label:'로마 문화와 크리스트교를 받아들인다', real:true, effect:{control:'catholic', strength:2},
+        pro:'로마 교회와 로마계 주민의 협조', con:'부족 전통 세력의 반발',
+        result:'교회와 로마계 주민이 네 통치에 협조하기 시작한다. 왕국이 안정되고 크리스트교가 서유럽으로 퍼진다.' },
+      { label:'부족의 {토속 신앙}과 전통을 지킨다', real:false, effect:{control:'pagan', strength:1},
+        pro:'부족의 결속 유지', con:'교회·로마계 주민의 협조를 얻기 어려움',
+        result:'부족의 결속은 지켰다. 하지만 교회의 협조를 얻은 이웃 왕국이 로마계 주민의 지지까지 얻으며 앞서 나간다.' },
+      { label:'크리스트교를 받아들이되 전통도 함께 지킨다', real:false, effect:{control:'catholic', strength:1},
+        pro:'반발을 줄이며 천천히 통합', con:'어느 쪽도 완전한 내 편이 되지 않음',
+        result:'큰 반발 없이 개종이 시작되지만 속도는 느리다. 교회는 네 미지근한 태도를 의심한다.' }
     ]
   },
-  { id:'p2', side:'islam', year:'711년', title:'우마이야 왕조의 이베리아반도 정복', region:'iberia',
-    role:{icon:'👑', text:'당신은 우마이야 왕조의 칼리프입니다'},
-    context:'우마이야 왕조가 지중해를 건너 유럽 쪽으로 세력을 넓히려 해요. 이베리아반도까지 진출할까요?',
-    sourceNote:'교과서에서 확인(주제13): 8세기 들어 우마이야 왕조가 바다를 건너 이베리아반도를 차지했다.',
+  { id:'e1', type:'event', year:'7세기~732', title:'이슬람 세계의 등장, 그리고 732년', region:'iberia', mapYear:'732년',
+    context:'아라비아반도에서 이슬람교가 등장했다(7세기). {우마이야 왕조} 때 이슬람 세력은 북아프리카를 지나 {이베리아반도}까지 차지했다. 이들이 더 나아가려 하자, 프랑크 왕국의 {재상} 카롤루스 마르텔이 투르·푸아티에 전투에서 막아냈다(732).',
+    sourceNote:'교과서 근거(주제13·14): 우마이야 왕조가 이베리아반도를 차지했고, 카롤루스 마르텔이 이슬람 세력을 물리쳐 서유럽 크리스트교 세계를 지켜냈다.',
+    eventEffects:[ {region:'iberia', control:'islamic', strength:2}, {region:'africa', control:'islamic', strength:2}, {region:'levant', control:'islamic', strength:2} ],
+    note:'비잔티움은 시리아·이집트를 잃었고, 이베리아반도는 이슬람 세계가 됐어. 서유럽과 이슬람 세계의 경계가 이때 그어진 거야.'
+  },
+  { id:'p3', type:'decision', year:'750년', title:'새 왕조, 새 질서', region:'levant', mapYear:'750년',
+    role:{icon:'👑', text:'너는 {아바스 왕조}의 새 지배자다'},
+    context:'{비아랍인}을 차별하던 {우마이야 왕조}가 무너지고 네가 새 왕조를 열었다. 제국 안에는 아랍인보다 훨씬 많은 비아랍인 이슬람교도가 산다. 이들을 어떻게 대할 것인가?',
+    sourceNote:'교과서 근거(주제14): 아바스 왕조는 비아랍인도 관리로 등용해 모든 이슬람교도를 동등하게 대했고, 그 결과 바그다드는 세계의 시장으로 번성했다.',
     options:[
-      { label:'지중해를 건너 이베리아반도를 정복한다', real:true, effect:{control:'islamic', strength:2},
-        pro:'영토와 교역로를 넓히고 유럽 진출의 발판을 마련한다', con:'바다 건너 원정은 부담이 크다',
-        result:'이베리아반도가 이슬람 세력권에 들어오며, 이후 유럽 진출의 발판이 됐다.' },
-      { label:'이베리아반도까지는 진출하지 않는다', real:false, effect:{control:'catholic', strength:1},
-        pro:'북아프리카를 안정시키는 데 힘을 모은다', con:'유럽 방향으로 세력을 넓힐 기회를 놓친다',
-        result:'가상: 서고트 왕국이 계속 이베리아반도를 다스렸다면, 이후 유럽의 세력 균형이 실제 역사와 크게 달라졌을 것이다.' }
+      { label:'모든 이슬람교도를 동등하게 대한다', real:true, effect:{control:'islamic', strength:2, extraRegion:'africa'},
+        pro:'제국의 통합, 폭넓은 인재 등용', con:'아랍인 기득권층의 반발',
+        result:'비아랍인도 관리가 되어 제국 운영에 참여한다. 다양한 민족의 학문과 문화가 모여들며 바그다드가 번성한다.' },
+      { label:'아랍인 중심 통치를 이어간다', real:false, effect:{control:'islamic', strength:1, extraRegion:'africa'},
+        pro:'아랍인 지배층의 확실한 결속', con:'비아랍인의 불만 누적',
+        result:'아랍인 지배층은 만족한다. 하지만 우마이야 왕조가 무너진 바로 그 이유 — 비아랍인의 불만 — 이 다시 쌓여 간다.' }
     ]
   },
-  { id:'p3', side:'christian', year:'732년', title:'투르·푸아티에 전투', region:'franks',
-    role:{icon:'⚔️', text:'당신은 프랑크 왕국의 재상 카롤루스 마르텔입니다'},
-    context:'이슬람 세력이 이베리아반도를 넘어 서유럽 내륙까지 진출하려 해요. 어떻게 대응할까요?',
-    sourceNote:'교과서에서 확인(주제13): 카롤루스 마르텔이 이슬람 세력을 물리치고 서유럽 크리스트교 세계를 지켜냈다.',
+  { id:'p5', type:'decision', year:'800년', title:'로마에서 온 결단', region:'franks', mapYear:'800년',
+    role:{icon:'✝️', text:'너는 로마 {교황}이다'},
+    context:'{비잔티움 제국} 황제는 {성상}을 파괴하라 명령했고, 성상 없이는 {게르만족} 선교가 어려운 너는 반발해 왔다. 그런 너에게 프랑크 왕국의 카롤루스가 땅을 바치고 있다. 그를 서로마 제국 황제로 임명할 것인가?',
+    sourceNote:'교과서 근거(주제13): 교황은 카롤루스 대제를 서로마 제국 황제로 임명했다(800). 비잔티움 제국은 이를 인정하지 않아 갈등이 깊어졌다.',
     options:[
-      { label:'군대를 이끌고 맞서 싸운다', real:true, effect:{control:'catholic', strength:2},
-        pro:'승리하면 서유럽 크리스트교 세계를 지켜낸다', con:'패배하면 왕국 전체가 위험해진다',
-        result:'이슬람 세력의 진출을 막아내며 서유럽은 가톨릭 세력권으로 굳어졌다.' },
-      { label:'전면전을 피하고 후퇴한다', real:false, effect:{control:'islamic', strength:2},
-        pro:'군대를 지키고 다음 기회를 노릴 수 있다', con:'이슬람 세력이 내륙까지 들어올 길이 열린다',
-        result:'가상: 이슬람 세력이 서유럽 내륙까지 밀고 들어오며 프랑크 왕국 일부가 이슬람 영향권에 들어갔다.' }
+      { label:'카롤루스를 서로마 황제로 임명한다', real:true, effect:{control:'catholic', strength:2},
+        pro:'서유럽의 강력한 보호자', con:'비잔티움과 사실상 결별',
+        result:'서유럽에 너를 지켜줄 황제가 생겼다. 하지만 유일한 로마 황제를 자처하던 비잔티움은 격노한다 — 동쪽과의 골이 깊어진다.' },
+      { label:'임명하지 않는다', real:false, effect:{control:'catholic', strength:1},
+        pro:'비잔티움과 화해의 여지', con:'서유럽에서 기댈 곳이 없음',
+        result:'비잔티움과의 관계는 아슬아슬하게 유지된다. 하지만 황제의 간섭은 계속되고, 서유럽에서 네 지위를 지켜줄 힘이 없다.' }
     ]
   },
-  { id:'p4', side:'islam', year:'750년', title:'아바스 왕조의 등장', region:'levant',
-    role:{icon:'👑', text:'당신은 아바스 왕조의 칼리프입니다'},
-    context:'비아랍인을 차별하던 우마이야 왕조가 무너지고 아바스 왕조가 들어섰어요. 새 왕조는 이슬람 세계를 어떻게 다스릴까요?',
-    sourceNote:'교과서에서 확인(주제14): 아바스 왕조는 비아랍인도 관리로 등용하는 등 모든 이슬람교도를 동등하게 대했고, 그 결과 바그다드는 세계의 시장으로 번성했다.',
+  { id:'e2', type:'event', year:'1054년', title:'교회가 둘로 갈라지다', region:'byzantium', mapYear:'1054년',
+    context:'{비잔티움 제국} 황제와 로마 {교황}의 대립은 결국 동·서로마 교회의 분열로 이어졌다(1054). 교황을 따르는 서유럽 교회는 로마 가톨릭, 황제가 주도하는 동유럽 교회는 그리스 정교로 불리게 됐다.',
+    sourceNote:'교과서 근거(주제13): 성상 숭배 논쟁과 대관 갈등 끝에 교회는 로마 가톨릭과 그리스 정교로 갈라섰다(1054).',
+    eventEffects:[ {region:'byzantium', control:'orthodox', strength:3} ],
+    note:'같은 크리스트교인데도 서쪽과 동쪽이 서로 다른 교회가 됐어. 지도에서 비잔티움의 색이 바뀐 걸 봐.'
+  },
+  { id:'p7', type:'decision', year:'11세기', title:'초원에서 온 새 강자', region:'levant', mapYear:'1071년',
+    role:{icon:'🏹', text:'너는 {셀주크 튀르크}의 {술탄}이다'},
+    context:'중앙아시아에서 온 너의 세력은 바그다드를 차지하고 {칼리프}에게서 {술탄} 칭호를 받았다. 서쪽에는 {비잔티움 제국}의 {소아시아}가, 남서쪽에는 {성지} 예루살렘이 있다. 어디로 갈 것인가?',
+    sourceNote:'교과서 근거(주제14·16): 셀주크 튀르크의 압박에 고전하던 비잔티움 제국이 교황에게 지원을 청한 것이 십자군 전쟁의 배경이 됐다(예루살렘 점령 1071).',
     options:[
-      { label:'비아랍인도 관리로 등용하며 포용 정책을 편다', real:true, effect:{control:'islamic', strength:2, extraRegion:'africa'},
-        pro:'페르시아인 등 비아랍인의 지지와 인재를 얻는다', con:'아랍인 지배층이 불만을 가질 수 있다',
-        result:'비아랍인도 끌어안으며 바그다드를 중심으로 이슬람 세계가 더 넓고 다양하게 뻗어나갔다.' },
-      { label:'우마이야 왕조처럼 아랍인 중심 통치를 이어간다', real:false, effect:{control:'islamic', strength:0, extraRegion:'africa'},
-        pro:'아랍인 지배층의 결속을 유지한다', con:'비아랍인의 불만이 계속 쌓여간다',
-        result:'가상: 비아랍계의 불만이 쌓이며 이슬람 세계가 여러 갈래로 쪼개지는 속도가 빨라졌다.' }
+      { label:'서쪽으로 세력을 넓힌다', real:true, effect:{control:'islamic', strength:2},
+        pro:'소아시아와 예루살렘 확보', con:'크리스트교 세계 전체를 자극',
+        result:'비잔티움을 몰아붙여 소아시아를 차지하고 예루살렘도 손에 넣었다(1071). 이슬람 세계의 최강자가 됐다 — 그런데 서쪽에서 심상치 않은 움직임이 느껴진다.' },
+      { label:'지금의 영역을 안정시키는 데 집중한다', real:false, effect:{control:'islamic', strength:1},
+        pro:'내부의 안정', con:'성장 정체, 주변 세력에 밀릴 수 있음',
+        result:'나라 안은 안정되지만, 초원에서 새 세력이 계속 밀려오는 상황에서 멈춰 선 강자는 오래가기 어렵다.' }
     ]
   },
-  { id:'p5', side:'christian', year:'800년', title:'카롤루스 대제의 대관', region:'franks',
-    role:{icon:'✝️', text:'당신은 로마 교황입니다'},
-    context:'카롤루스 대제가 서유럽 대부분을 정복하고 교회에 많은 땅을 바쳤어요. 그를 어떻게 대우할까요?',
-    sourceNote:'교과서에서 확인(주제13): 교황은 카롤루스 대제를 서로마 제국 황제로 임명했다(800). 비잔티움 제국은 이를 인정하지 않았다.',
-    options:[
-      { label:'카롤루스 대제를 서로마 황제로 임명한다', real:true, effect:{control:'catholic', strength:2},
-        pro:'교회를 지켜줄 강한 보호자를 얻고 비잔티움의 간섭에서 벗어난다', con:'비잔티움 제국과의 갈등이 깊어진다',
-        result:'교황권과 세속 권력이 결합하며 서유럽에서 가톨릭의 정치적 힘이 굳건해졌다. 비잔티움 제국은 이 대관을 인정하지 않아 갈등의 불씨가 됐다.' },
-      { label:'대관을 하지 않고 프랑크 왕국을 세속 국가로 남긴다', real:false, effect:{control:'catholic', strength:1},
-        pro:'비잔티움 제국과의 관계가 더 나빠지지는 않는다', con:'교회를 지켜줄 강한 세속 권력을 얻지 못한다',
-        result:'가상: 교회와 세속 권력의 결합이 약해져 서유럽에서 교회의 정치적 영향력은 실제 역사보다 작았을 것이다.' }
-    ]
-  },
-  { id:'p6', side:'christian', year:'1054년', title:'동서 교회의 분열', region:'byzantium',
-    role:{icon:'✝️', text:'당신은 로마 교황입니다'},
-    context:'성상 숭배를 둘러싼 갈등이 오랫동안 이어졌어요. 로마 교회는 비잔티움 교회와 어떤 길을 갈까요?',
-    sourceNote:'교과서에서 확인(주제13): 카롤루스 대제의 대관을 비잔티움 제국이 인정하지 않으며 동·서로마 교회의 갈등이 심해졌고, 결국 로마 가톨릭과 그리스 정교로 갈라섰다.',
-    options:[
-      { label:'갈등 끝에 로마 가톨릭과 그리스 정교로 갈라선다', real:true, effect:{control:'orthodox', strength:2},
-        pro:'서유럽 교회의 독자적인 수장이 된다', con:'크리스트교 세계가 둘로 갈라진다',
-        result:'비잔티움은 그리스 정교의 중심이 되어 로마 가톨릭 세계와 다른 길을 걷게 됐다.' },
-      { label:'갈등을 봉합하고 하나의 교회로 남는다', real:false, effect:{control:'catholic', strength:1},
-        pro:'크리스트교 세계의 통일을 지킨다', con:'비잔티움 황제의 교회 간섭을 계속 받아들여야 한다',
-        result:'가상: 로마와 콘스탄티노폴리스가 하나의 교회로 남았다면, 이후 서유럽과 비잔티움의 관계는 실제 역사와 크게 달랐을 것이다.' }
-    ]
-  },
-  { id:'p7', side:'islam', year:'1071년', title:'셀주크 튀르크의 확장', region:'levant',
-    role:{icon:'🏹', text:'당신은 셀주크 튀르크의 술탄입니다'},
-    context:'셀주크 튀르크가 비잔티움 제국을 압박하며 세력을 넓히고 있어요. 어떤 선택을 할까요?',
-    sourceNote:'교과서에서 확인(주제14·16): 셀주크 튀르크는 칼리프로부터 술탄 칭호를 받았고, 그 압박에 고전하던 비잔티움 제국이 교황에게 지원을 청한 것이 십자군 전쟁의 배경이 됐다(예루살렘 점령 1071).',
-    options:[
-      { label:'예루살렘을 비롯한 서아시아로 세력을 넓힌다', real:true, effect:{control:'islamic', strength:2},
-        pro:'서아시아의 패권을 잡고 세력을 크게 넓힌다', con:'비잔티움이 서유럽에 도움을 청할 명분이 된다',
-        result:'비잔티움이 위협을 느끼며 교황에게 도움을 청했고, 이는 훗날 십자군 전쟁의 배경이 됐다.' },
-      { label:'비잔티움과 우호 관계를 유지하며 확장을 자제한다', real:false, effect:{control:'islamic', strength:1},
-        pro:'비잔티움과의 큰 충돌을 피한다', con:'세력을 넓힐 기회를 놓친다',
-        result:'가상: 비잔티움이 큰 위협을 느끼지 않았다면, 교황에게 도움을 요청할 이유도 십자군을 소집할 명분도 약해졌을 것이다.' }
-    ]
-  },
-  { id:'p8', side:'islam', year:'1258년', title:'몽골의 바그다드 점령', region:'levant',
-    role:{icon:'🐫', text:'당신은 이슬람 세계의 상인입니다'},
-    context:'몽골군이 서아시아까지 밀고 들어와 아바스 왕조의 수도 바그다드를 점령했어요. 이슬람 세계 사람들은 이 상황에 어떻게 대응할까요?',
-    sourceNote:'교과서에서 확인(주제16): 몽골인은 이슬람교를 허용했고 이후 개종한 지배층도 많아졌다. 이슬람 상인들은 몽골 제국의 안정된 교역망을 통해 더욱 활발히 무역했고, 이슬람 세계는 더 넓어졌다.',
-    options:[
-      { label:'몽골의 지배를 받아들이고, 이슬람으로 개종한 몽골 지배층과 함께 교역망을 넓힌다', real:true, effect:{control:'islamic', strength:1},
-        pro:'안정된 교역망 속에서 무역을 크게 넓힐 수 있다', con:'몽골의 지배를 받아들여야 한다',
-        result:'바그다드는 무너졌지만 몽골 지배층이 이슬람교를 받아들이며, 안정된 교역망 속에서 이슬람 세계는 오히려 더 넓어졌다.' },
-      { label:'끝까지 저항한다', real:false, effect:{control:'islamic', strength:-1},
-        pro:'이슬람 세계의 자존심과 독립을 지킨다', con:'더 큰 파괴와 보복을 부를 수 있다',
-        result:'가상: 끝까지 저항했다면 바그다드의 파괴는 더 컸고, 이슬람 세계의 회복은 실제 역사보다 느려졌을 것이다.' }
-    ]
+  { id:'e3', type:'event', year:'1095년', title:'편지 한 통', region:'byzantium', mapYear:'1095년',
+    context:'{셀주크 튀르크}의 압박에 고전하던 {비잔티움 제국}이 로마 {교황}에게 지원을 요청했다. 교황은 서유럽인들에게 호소했다 — "{성지} 예루살렘을 되찾자!" 왕과 영주, 기사, 상인, 농민까지 호응해 십자군이 조직됐다.',
+    sourceNote:'교과서 근거(주제16): 셀주크 튀르크의 압박에 비잔티움이 교황에게 지원을 청하자, 교황이 이에 화답해 십자군이 조직됐다(1095).',
+    eventEffects:[],
+    note:'1054년에 갈라섰던 비잔티움이 교황에게 도움을 청하고, 교황의 말 한마디에 전 유럽이 움직였어. 연대기는 여기서 끝 — 그런데, 뭔가 이상하지 않아?'
   }
 ];
 
@@ -615,7 +659,7 @@ const POINTS = [
    상태
    ========================================================= */
 let state = {
-  side:null, studentId:'', studentName:'',
+  studentId:'', studentName:'',
   regions:{}, log:[], stepIndex:0, timeline:[]
 };
 
@@ -643,22 +687,9 @@ document.getElementById('grade').addEventListener('change', updateIdPreview);
 document.getElementById('classNo').addEventListener('input', updateIdPreview);
 document.getElementById('numberNo').addEventListener('input', updateIdPreview);
 
-function selectSide(side){
-  state.side = side;
-  document.getElementById('btnChristian').classList.toggle('selected', side==='christian');
-  document.getElementById('btnIslam').classList.toggle('selected', side==='islam');
-  document.getElementById('startBtn').disabled = false;
-  document.getElementById('sideBadge').textContent = side==='christian' ? '진영: 크리스트교 세계' : '진영: 이슬람 세계';
-}
-
 function buildTimeline(){
-  const tl = [];
-  POINTS.forEach(p=>{
-    const bg = BACKGROUNDS.find(b=>b.before===p.id);
-    if(bg) tl.push({type:'bg', data:bg});
-    tl.push({type:'point', data:p});
-  });
-  return tl;
+  // 관점 전환형: 진영 구분 없이 시대순 단일 흐름
+  return POINTS.map(p => ({ type:'point', data:p }));
 }
 
 function startGame(){
@@ -672,10 +703,6 @@ function startGame(){
     alert('이름을 입력해 주세요.');
     return;
   }
-  if(!state.side){
-    alert('진영을 선택해 주세요.');
-    return;
-  }
   state.regions = freshRegions();
   state.timeline = buildTimeline();
   state.stepIndex = 0;
@@ -687,19 +714,21 @@ function startGame(){
   renderMap('mapSvg', 'legend', state.regions);
 }
 
+// 연대기 리본 (윗쪽 타임라인)
+const CHRONO_YEARS = ['476','732','750','800','1054','1071','1095'];
 function renderProgress(){
-  const bar = document.getElementById('progressBar');
-  bar.innerHTML='';
-  state.timeline.forEach((_, i)=>{
-    const d = document.createElement('div');
-    d.className = 'dot' + (i < state.stepIndex ? ' done' : i === state.stepIndex ? ' now' : '');
-    bar.appendChild(d);
-  });
+  const bar = document.getElementById('chrono');
+  if(!bar) return;
+  bar.innerHTML = CHRONO_YEARS.map((y,i)=>{
+    const cls = i < state.stepIndex ? 'done' : i === state.stepIndex ? 'now' : '';
+    return `<div class="chr-node ${cls}"><div class="chr-dot"></div><div class="chr-year">${y}</div></div>`;
+  }).join('');
 }
 
 function clampStrength(v){ return Math.max(0, Math.min(4, v)); }
 
-function applyEffect(regionId, effect, animate){
+// 결정 카드용: 기존 강도에 누적
+function applyEffect(regionId, effect){
   const r = state.regions[regionId];
   r.control = effect.control;
   r.strength = clampStrength(r.strength + effect.strength);
@@ -708,6 +737,39 @@ function applyEffect(regionId, effect, animate){
     r2.control = effect.control;
     r2.strength = clampStrength(r2.strength + effect.strength);
   }
+}
+// 사건 카드용: 절대값 세팅
+function applyEventEffects(effects){
+  (effects||[]).forEach(e=>{
+    const r = state.regions[e.region];
+    r.control = e.control;
+    r.strength = clampStrength(e.strength);
+  });
+}
+
+// 용어 {..} → 밑줄 span
+function renderTerms(text){
+  return text.replace(/\{([^}]+)\}/g, (_, w)=>
+    TERMS[w] ? `<span class="term" onclick="openTerm('${w}')">${w}</span>` : w);
+}
+function openTerm(w){
+  document.getElementById('sheetTitle').textContent = w;
+  document.getElementById('sheetBody').textContent = TERMS[w] || '';
+  document.getElementById('sheetBack').classList.add('open');
+}
+function closeSheet(){ document.getElementById('sheetBack').classList.remove('open'); }
+
+// 선택지 셔플
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+// 포털 복귀
+function goPortal(){
+  const q = (state.studentId && state.studentName)
+    ? `?sid=${encodeURIComponent(state.studentId)}&name=${encodeURIComponent(state.studentName)}` : '';
+  location.href = CONFIG.PORTAL_URL + q;
 }
 
 function animateCardIn(card){
@@ -721,72 +783,45 @@ function renderStep(){
   const step = state.timeline[state.stepIndex];
   const card = document.getElementById('stepCard');
   if(!step){ goToSummary(); return; }
-
-  /* --- 시대의 흐름(배경): 효과 즉시 적용, 전령 카드 --- */
-  if(step.type === 'bg'){
-    if(!step.done){
-      step.done = true;
-      step.data.effects.forEach(e=>applyEffect(e.region, {control:e.control, strength:e.strength}));
-      renderMap('mapSvg', 'legend', state.regions);
-    }
-    card.classList.add('auto-card');
-    card.innerHTML = `
-      <span class="tag courier">📜 전령의 소식 · 시대의 흐름</span>
-      <p class="courier-note">두 진영 모두에게 전해지는 큰 흐름이에요. 실제 역사 그대로 진행됩니다.</p>
-      <p class="context">${step.data.text}</p>
-      <div class="actions"><button class="btn" onclick="nextStep(this)">다음으로</button></div>`;
-    animateCardIn(card);
-    return;
-  }
-
   const p = step.data;
-  const isPlayerChoice = (p.side === state.side);
-  const tagClass = p.side === 'christian' ? 'christian' : 'islamic';
-  const tagText = p.side === 'christian' ? '크리스트교 세계' : '이슬람 세계';
+  document.getElementById('mapYearTag').textContent = p.mapYear || p.year;
 
-  /* --- 상대 진영 사건: 전령의 소식, 실제 역사 자동 적용 --- */
-  if(!isPlayerChoice){
-    const realOpt = p.options.find(o=>o.real);
+  /* --- 사건 카드: 선택 없이 내레이션 + 지도 변화 --- */
+  if(p.type === 'event'){
     if(!step.done){
       step.done = true;
-      applyEffect(p.region, realOpt.effect);
-      renderMap('mapSvg', 'legend', state.regions, p.region);
-      state.log.push({ id:p.id, year:p.year, title:p.title, chosenLabel:realOpt.label + '(실제 역사)', real:true, result:realOpt.result, auto:true });
+      applyEventEffects(p.eventEffects);
+      const pulse = (p.eventEffects && p.eventEffects[0]) ? p.eventEffects[0].region : p.region;
+      renderMap('mapSvg', 'legend', state.regions, pulse);
     }
-    card.classList.add('auto-card');
+    card.classList.add('event-card');
     card.innerHTML = `
-      <span class="tag courier">📜 전령의 소식 · ${tagText}</span>
-      <p class="courier-note">여러분 손이 닿지 않는 상대 진영의 일이에요. 실제 역사 그대로 전해집니다.</p>
-      <div class="year">${p.year}</div>
-      <div class="title">${p.title}</div>
-      <p class="context">${p.context}</p>
-      <div class="result-box">
-        <span class="auto-label">실제 역사 — ${realOpt.label}</span>
-        ${realOpt.result}
-      </div>
+      <span class="tag event">📜 역사의 기록 · ${p.year}</span>
+      <div class="year">${p.title}</div>
+      <div class="context"><p>${renderTerms(p.context)}</p>
+        ${p.note ? `<p style="color:var(--ink-soft);font-size:14px;">🔎 ${renderTerms(p.note)}</p>`:''}</div>
       <div class="source-note">${p.sourceNote}</div>
-      <div class="actions"><button class="btn" onclick="nextStep(this)">다음으로</button></div>`;
+      <div class="actions"><button class="btn" onclick="nextStep(this)">계속 →</button></div>`;
     animateCardIn(card);
     return;
   }
 
-  /* --- 내 진영 갈림길: 역할 배지 + 선택지(기대/위험). 교과서 근거는 선택 후 공개 --- */
-  card.classList.remove('auto-card');
+  /* --- 결정 카드: 역할 배지 + 랜덤 배치 선택지(기대/위험). 무보상 판단 --- */
+  card.classList.remove('event-card');
+  const shuffled = shuffle(p.options.map((o,i)=>({o, i})));
   let optionsHtml = '';
-  p.options.forEach((opt, idx)=>{
+  shuffled.forEach(({o, i})=>{
     optionsHtml += `
-      <button class="option" id="opt-${idx}" onclick="choose(${idx})">
-        <span class="opt-label">${opt.label}</span>
-        <span class="opt-meta"><b class="pro">기대</b>${opt.pro}<span class="sep">·</span><b class="con">위험</b>${opt.con}</span>
+      <button class="option" onclick="choose(${i})">
+        <span class="opt-label">${renderTerms(o.label)}</span>
+        <span class="opt-meta"><b class="pro">얻는 것</b>${o.pro}<span class="sep">·</span><b class="con">감수할 것</b>${o.con}</span>
       </button>`;
   });
-
   card.innerHTML = `
-    <span class="tag ${tagClass}">${tagText} · 나의 갈림길</span>
-    <div class="role-badge"><span class="role-icon">${p.role.icon}</span>${p.role.text}</div>
-    <div class="year">${p.year}</div>
-    <div class="title">${p.title}</div>
-    <p class="context">${p.context}</p>
+    <span class="tag decision">🔀 결정의 순간 · ${p.year}</span>
+    <div class="role-badge"><span class="role-icon">${p.role.icon}</span>${renderTerms(p.role.text)}</div>
+    <div class="year">${p.title}</div>
+    <div class="context"><p>${renderTerms(p.context)}</p></div>
     ${optionsHtml}
     <div id="resultArea"></div>`;
   animateCardIn(card);
@@ -799,28 +834,73 @@ function choose(idx){
 
   const p = step.data;
   const opt = p.options[idx];
+  const realOpt = p.options.find(o=>o.real);
 
-  document.querySelectorAll('.option').forEach((el,i)=>{
+  document.querySelectorAll('.option').forEach((el)=>{
     el.disabled = true;
-    if(i===idx) el.classList.add('picked');
+    if(el.getAttribute('onclick') === `choose(${idx})`) el.classList.add('picked');
   });
 
-  applyEffect(p.region, opt.effect);
+  state.log.push({ id:p.id, year:p.year, title:p.title,
+    chosenLabel:opt.label, chosenShort:opt.label, realShort:realOpt.label,
+    real:!!opt.real, result:opt.result });
+
+  const zone = document.getElementById('resultArea');
+
+  if(opt.real){
+    // 실제 역사와 같은 노선 → 지도 반영 + 통합 결과
+    applyEffect(p.region, opt.effect);
+    renderMap('mapSvg', 'legend', state.regions, p.region);
+    zone.innerHTML = `
+      <div class="result-box real">
+        <span class="flag">네 선택의 결과 <span class="badge-pill m">실제 역사도 이 길</span></span>
+        ${opt.result}
+      </div>
+      <div class="result-box actual">
+        <span class="flag">📜 이 시대의 기록</span>
+        ${p.sourceNote.replace(/^교과서 근거[^:]*:\s*/, '')}
+      </div>
+      <div class="actions"><button class="btn" onclick="nextStep(this)">계속 →</button></div>`;
+  } else {
+    // 가상 분기 → 미리보기 지도(점선 강조) + "실제 역사는?" 버튼
+    const preview = JSON.parse(JSON.stringify(state.regions));
+    preview[p.region].control = opt.effect.control;
+    preview[p.region].strength = clampStrength(preview[p.region].strength + opt.effect.strength);
+    if(opt.effect.extraRegion){
+      preview[opt.effect.extraRegion].control = opt.effect.control;
+      preview[opt.effect.extraRegion].strength = clampStrength(preview[opt.effect.extraRegion].strength + opt.effect.strength);
+    }
+    renderMap('mapSvg', 'legend', preview, p.region, [p.region]);
+    zone.innerHTML = `
+      <div class="result-box virtual">
+        <span class="flag">네 선택의 결과 <span class="badge-pill v">⚠ 가상 분기</span></span>
+        ${opt.result}
+        <p style="font-size:13px;color:#8a4438;margin:6px 0 0;">지금 지도는 실제 역사와 다른 <b>상상의 갈래</b>야.</p>
+      </div>
+      <div class="actions"><button class="btn" onclick="revealActual(this)">그럼 실제 역사는? →</button></div>`;
+  }
+}
+
+function revealActual(btn){
+  if(btn) btn.disabled = true;
+  const step = state.timeline[state.stepIndex];
+  const p = step.data;
+  const realOpt = p.options.find(o=>o.real);
+  // 실제 역사 트랙 복귀
+  applyEffect(p.region, realOpt.effect);
   renderMap('mapSvg', 'legend', state.regions, p.region);
-
-  state.log.push({ id:p.id, year:p.year, title:p.title, chosenLabel:opt.label, real:opt.real, result:opt.result });
-
-  document.getElementById('resultArea').innerHTML = `
-    <div class="result-box">
-      ${opt.real ? '<span class="auto-label">📜 실제 역사와 같은 길을 골랐어요</span>' : '<span class="flag">⚡ 가상 선택 — 실제 역사와 다른 경로예요</span>'}
-      ${opt.result}
+  document.getElementById('resultArea').insertAdjacentHTML('beforeend', `
+    <div class="result-box actual">
+      <span class="flag">📜 실제 역사</span>
+      ${realOpt.result}
+      <p style="font-size:13px;color:var(--ink-soft);margin:6px 0 0;">💭 실제 역사는 왜 이 길로 갔을까? 마지막에 쓸 거리로 기억해 둬.</p>
     </div>
-    <div class="source-note">${p.sourceNote}</div>
-    <div class="actions"><button class="btn" onclick="nextStep(this)">다음으로</button></div>`;
+    <div class="actions"><button class="btn" onclick="nextStep(this)">계속 →</button></div>`);
+  btn.closest('.actions').remove();
 }
 
 function nextStep(btn){
-  if(btn) btn.disabled = true;    // 연타 방지: 누르는 즉시 잠금
+  if(btn) btn.disabled = true;    // 연타 방지
   state.stepIndex++;
   renderStep();
 }
@@ -828,9 +908,10 @@ function nextStep(btn){
 /* =========================================================
    지도 렌더링 — 실제 해안선 + 거점 버블(halo+marker)
    ========================================================= */
-function renderMap(svgId, legendId, regionsState, pulseRegion){
+function renderMap(svgId, legendId, regionsState, pulseRegion, altRegions){
   const svg = document.getElementById(svgId);
   svg.innerHTML = '';
+  altRegions = altRegions || [];
 
   const sea = document.createElementNS('http://www.w3.org/2000/svg','rect');
   sea.setAttribute('x','0'); sea.setAttribute('y','0');
@@ -862,7 +943,7 @@ function renderMap(svgId, legendId, regionsState, pulseRegion){
     bubble.setAttribute('cx', c.x); bubble.setAttribute('cy', c.y);
     bubble.setAttribute('r', markerR);
     bubble.setAttribute('fill', color);
-    bubble.setAttribute('class','bubble' + (pulseRegion===id ? ' pulse' : ''));
+    bubble.setAttribute('class','bubble' + (pulseRegion===id ? ' pulse' : '') + (altRegions.includes(id) ? ' alt' : ''));
     svg.appendChild(bubble);
 
     const label = document.createElementNS('http://www.w3.org/2000/svg','text');
@@ -938,19 +1019,20 @@ function renderGauge(regionsState){
    ========================================================= */
 function computeRealHistory(){
   const r = freshRegions();
-  BACKGROUNDS.forEach(bg=>{
-    bg.effects.forEach(e=>{
-      r[e.region].control = e.control;
-      r[e.region].strength = clampStrength(r[e.region].strength + e.strength);
-    });
-  });
   POINTS.forEach(p=>{
-    const realOpt = p.options.find(o=>o.real);
-    r[p.region].control = realOpt.effect.control;
-    r[p.region].strength = clampStrength(r[p.region].strength + realOpt.effect.strength);
-    if(realOpt.effect.extraRegion){
-      r[realOpt.effect.extraRegion].control = realOpt.effect.control;
-      r[realOpt.effect.extraRegion].strength = clampStrength(r[realOpt.effect.extraRegion].strength + realOpt.effect.strength);
+    if(p.type === 'event'){
+      (p.eventEffects||[]).forEach(e=>{
+        r[e.region].control = e.control;
+        r[e.region].strength = clampStrength(e.strength);
+      });
+    } else {
+      const realOpt = p.options.find(o=>o.real);
+      r[p.region].control = realOpt.effect.control;
+      r[p.region].strength = clampStrength(r[p.region].strength + realOpt.effect.strength);
+      if(realOpt.effect.extraRegion){
+        r[realOpt.effect.extraRegion].control = realOpt.effect.control;
+        r[realOpt.effect.extraRegion].strength = clampStrength(r[realOpt.effect.extraRegion].strength + realOpt.effect.strength);
+      }
     }
   });
   return r;
@@ -960,42 +1042,47 @@ function computeRealHistory(){
    요약 화면
    ========================================================= */
 function goToSummary(){
+  renderProgress();
   document.getElementById('screen-play').classList.add('hidden');
   document.getElementById('screen-summary').classList.remove('hidden');
 
+  const decisions = state.log.filter(l=>!l.auto);
+
+  // 가장 고민된 갈림길 선택지
   const sel = document.getElementById('hardestPoint');
   sel.innerHTML = '';
-  state.log.filter(l=>!l.auto).forEach(l=>{
+  decisions.forEach(l=>{
     const o = document.createElement('option');
     o.value = l.id;
-    o.textContent = `${l.year} ${l.title} — 내 선택: ${l.chosenLabel}`;
+    o.textContent = `${l.year} ${l.title} — 내 선택: ${l.chosenShort}`;
     sel.appendChild(o);
   });
 
+  // 지도 비교
   renderMap('mapSvgMine', 'legend2', state.regions);
   const realState = computeRealHistory();
   renderMap('mapSvgReal', null, realState);
 
-  const diffList = document.getElementById('diffList');
-  diffList.innerHTML = '';
-  let diffCount = 0;
-  Object.keys(REGIONS).forEach(id=>{
-    const mine = state.regions[id].control;
-    const real = realState[id].control;
-    const div = document.createElement('div');
-    if(mine === real){
-      div.className = 'diff-item same';
-      div.textContent = `${REGIONS[id].name}: 실제 역사와 동일 (${CONTROL_LABEL[real]})`;
-    } else {
-      diffCount++;
-      div.className = 'diff-item diff';
-      div.textContent = `${REGIONS[id].name}: 나는 "${CONTROL_LABEL[mine]}"을 선택 → 실제 역사는 "${CONTROL_LABEL[real]}". 왜 실제 역사는 이렇게 흘러갔을까?`;
-    }
-    diffList.appendChild(div);
+  // 선택 비교 테이블
+  const rows = decisions.map(l=>`
+    <tr>
+      <td>${l.year}<br><span style="font-size:12.5px;color:var(--ink-soft)">${l.title}</span></td>
+      <td>${l.chosenShort}</td>
+      <td>${l.realShort}</td>
+      <td class="${l.real?'match':'mism'}">${l.real?'일치':'다름'}</td>
+    </tr>`).join('');
+  document.getElementById('reviewTable').innerHTML =
+    `<tr><th>갈림길</th><th>내 선택</th><th>실제 역사</th><th>결과</th></tr>${rows}`;
+
+  // 글자수 카운터
+  document.getElementById('minChar').textContent = CONFIG.MIN_REFLECTION;
+  const ta = document.getElementById('reflection');
+  const submitBtn = document.getElementById('submitBtn');
+  ta.addEventListener('input', ()=>{
+    const n = ta.value.trim().length;
+    document.getElementById('charCount').textContent = n;
+    submitBtn.disabled = n < CONFIG.MIN_REFLECTION;
   });
-  if(diffCount === 0){
-    diffList.insertAdjacentHTML('afterbegin', `<div class="diff-item allsame">모든 지역이 실제 역사와 같은 방향으로 갔어요 — 그럴 만한 이유가 있었던 선택을 골랐다는 뜻이에요.</div>`);
-  }
 }
 
 /* =========================================================
@@ -1003,8 +1090,8 @@ function goToSummary(){
    ========================================================= */
 async function submitResult(){
   const reflection = document.getElementById('reflection').value.trim();
-  if(reflection.length < 5){
-    alert('왜 그 선택을 했는지 한두 문장으로 써줘.');
+  if(reflection.length < CONFIG.MIN_REFLECTION){
+    alert('왜 그 선택을 했는지 조금 더 써줘. (최소 ' + CONFIG.MIN_REFLECTION + '자)');
     return;
   }
   const sel = document.getElementById('hardestPoint');
@@ -1095,21 +1182,22 @@ async function enterDashboard(){
 }
 
 function renderDashboard(rows){
+  const decisionCount = POINTS.filter(p=>p.type==='decision').length;
   document.getElementById('dashStats').innerHTML = `
     <div class="stat-grid">
       <div class="stat-box"><div class="num">${rows.length}</div><div class="lab">제출 인원</div></div>
-      <div class="stat-box"><div class="num">${state.side==='christian'?'':''}${POINTS.length}</div><div class="lab">전체 결정 포인트</div></div>
+      <div class="stat-box"><div class="num">${decisionCount}</div><div class="lab">결정 갈림길 수</div></div>
       <div class="stat-box"><div class="num">${rows.filter(r=>r.diffSummary && r.diffSummary!=='모두 실제 역사와 동일').length}</div><div class="lab">실제 역사와 다른 선택을 한 학생</div></div>
     </div>`;
 
   const bars = document.getElementById('dashBars');
   bars.innerHTML = '';
-  POINTS.forEach(p=>{
+  POINTS.filter(p=>p.type==='decision').forEach(p=>{
     let realCount=0, altCount=0;
     rows.forEach(r=>{
       try{
         const detail = JSON.parse(r.choicesJson || '[]');
-        const hit = detail.find(d=>d.id===p.id && !d.auto);
+        const hit = detail.find(d=>d.id===p.id);
         if(hit){ hit.real ? realCount++ : altCount++; }
       }catch(e){}
     });
@@ -1123,7 +1211,7 @@ function renderDashboard(rows){
           <div class="bar-real" style="width:${realPct}%"></div>
           <div class="bar-alt" style="width:${altPct}%"></div>
         </div>
-        <div class="bar-caption">실제 역사 선택 ${realCount}명 · 가상 선택 ${altCount}명 ${total===0?'(직접 선택한 학생 없음 — 반대 진영에서는 자동 진행)':''}</div>
+        <div class="bar-caption">실제 역사와 같은 선택 ${realCount}명 · 다른 선택 ${altCount}명 ${total===0?'(아직 제출 없음)':''}</div>
       </div>`);
   });
 
@@ -1145,6 +1233,7 @@ function exitDashboard(){
   const p = new URLSearchParams(location.search);
   const sid = p.get('sid') || '', name = p.get('name') || '';
   if(/^\d{5}$/.test(sid)){
+    document.getElementById('grade').value = sid.slice(0,1);
     document.getElementById('classNo').value = Number(sid.slice(1,3));
     document.getElementById('numberNo').value = Number(sid.slice(3,5));
     if(typeof updateIdPreview === 'function') updateIdPreview();
