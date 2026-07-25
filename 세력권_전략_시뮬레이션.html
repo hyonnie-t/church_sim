@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>세력권 전략 시뮬레이션 — 크리스트교와 이슬람 세계</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+  :root{
+    --ink:#2E2A38;
+    --ink-soft:#5B5468;
+    --paper:#FBF6EC;
+    --paper-deep:#F3E7C9;
+    --card:#FFFDF7;
+    --line:#E6D7A8;
+
+    --gold:#E3A73B;
+    --gold-deep:#B5791D;
+    --byzant:#3E7CC2;
+    --byzant-deep:#295C93;
+    --islamic:#20A879;
+    --islamic-deep:#15805B;
+    --pagan:#8C7F68;
+    --arian:#A868C9;
+    --neutral:#B9AF9B;
+
+    --accent:#7C4DFF;
+    --accent-deep:#5E2FE0;
+    --danger:#E2483F;
+
+    --shadow: 0 8px 24px rgba(46,42,56,0.14);
+    --shadow-lg: 0 16px 40px rgba(46,42,56,0.20);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse 700px 500px at 10% -5%, rgba(227,167,59,0.16), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 10%, rgba(62,124,194,0.14), transparent 60%),
+      radial-gradient(ellipse 800px 600px at 50% 120%, rgba(32,168,121,0.10), transparent 60%),
+      var(--paper);
+    color:var(--ink);
+    font-family:'Pretendard','Noto Sans KR', sans-serif;
+    font-size:17px;
+    line-height:1.65;
+    min-height:100vh;
+  }
+  h1,h2,h3,.display{ font-family:'Nanum Myeongjo', serif; color:var(--ink); margin:0; }
+  .wrap{ max-width:980px; margin:0 auto; padding:22px 18px 70px; }
+
+  header.top{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 4px 22px; margin-bottom:24px; flex-wrap:wrap; gap:10px;
+    border-bottom:2px solid var(--line);
+  }
+  header.top .eyebrow{ font-size:13px; letter-spacing:.14em; color:var(--accent-deep); font-weight:800; }
+  header.top h1{ font-size:27px; font-weight:800; }
+  .badge{
+    font-size:13px; padding:6px 14px; border-radius:999px;
+    background:var(--card); border:1.5px solid var(--line); color:var(--ink-soft);
+    white-space:nowrap; font-weight:600;
+  }
+
+  .banner{
+    background:linear-gradient(135deg, #FFF7E4, #FBEEDD);
+    border:1.5px solid var(--gold);
+    border-radius:16px; padding:18px 20px; margin-bottom:22px; box-shadow:var(--shadow);
+  }
+  .banner strong{ color:var(--gold-deep); }
+
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:18px;
+    padding:24px 24px 26px; box-shadow:var(--shadow); margin-bottom:20px;
+    position:relative;
+  }
+  .corner-flourish{ position:absolute; width:26px; height:26px; opacity:.5; }
+  .corner-flourish.tl{ top:10px; left:10px; }
+  .corner-flourish.tr{ top:10px; right:10px; transform:scaleX(-1); }
+
+  .field{margin-bottom:16px;}
+  .field label{ display:block; font-weight:700; margin-bottom:7px; font-size:15px; color:var(--ink-soft); }
+  input[type=text], input[type=number], input[type=password], textarea, select{
+    width:100%; font-family:'Pretendard','Noto Sans KR', sans-serif; font-size:16px;
+    padding:12px 14px; border-radius:11px; border:1.6px solid var(--line);
+    background:#fffefb; color:var(--ink);
+  }
+  textarea{min-height:64px; resize:vertical;}
+  input:focus, textarea:focus, select:focus, button:focus-visible{
+    outline:3px solid var(--accent); outline-offset:1px;
+  }
+  .id-row{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; }
+  @media (max-width:520px){ .id-row{grid-template-columns:1fr;} }
+
+  .side-select{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:18px 0 6px; }
+  @media (max-width:560px){ .side-select{grid-template-columns:1fr;} }
+  .side-btn{
+    cursor:pointer; border-radius:16px; border:2.5px solid var(--line);
+    background:#fffefb; padding:22px 18px; text-align:left; min-height:70px;
+    transition:.15s;
+  }
+  .side-btn:hover{ transform:translateY(-2px); box-shadow:var(--shadow); }
+  .side-btn.selected{ box-shadow:var(--shadow-lg); }
+  .side-btn.christian.selected{ border-color:var(--gold); background:#FFF6E0; }
+  .side-btn.islam.selected{ border-color:var(--islamic); background:#E4F7EE; }
+  .side-btn .name{ font-family:'Nanum Myeongjo',serif; font-weight:800; font-size:20px; display:block; margin-bottom:5px; }
+  .side-btn.christian .name{ color:var(--gold-deep); }
+  .side-btn.islam .name{ color:var(--islamic-deep); }
+  .side-btn .desc{ font-size:14px; color:var(--ink-soft); }
+
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    cursor:pointer; border:none; border-radius:12px; padding:14px 24px;
+    font-family:'Pretendard','Noto Sans KR', sans-serif; font-weight:800; font-size:16px;
+    min-height:52px; background:var(--accent); color:#fff; box-shadow:var(--shadow);
+    transition:.15s;
+  }
+  .btn:hover{ background:var(--accent-deep); transform:translateY(-1px); }
+  .btn[disabled]{ background:#CFC7DE; cursor:not-allowed; box-shadow:none; transform:none; }
+  .btn.ghost{ background:transparent; color:var(--ink-soft); border:1.6px solid var(--line); box-shadow:none; }
+  .btn.ghost:hover{ background:var(--paper-deep); color:var(--ink); }
+  .btn.small{ padding:9px 16px; min-height:38px; font-size:14px; }
+  .actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:18px; flex-wrap:wrap; }
+
+  /* map */
+  .map-panel{
+    background:linear-gradient(180deg, #EAF3F6, #E4EEF2);
+    border:1px solid var(--line); border-radius:20px; padding:14px;
+    box-shadow:var(--shadow); margin-bottom:20px; overflow:hidden;
+  }
+  .map-panel h3{
+    font-size:14.5px; letter-spacing:.05em; color:var(--ink-soft);
+    margin:2px 4px 10px; font-family:'Pretendard',sans-serif; font-weight:800;
+  }
+  svg.gamemap{ width:100%; height:auto; display:block; border-radius:14px; }
+  .land{ fill:#E8D9AF; stroke:#C9B584; stroke-width:0.6; }
+  .sea{ fill:#DCEEF2; }
+  .halo{ transition: r 0.7s cubic-bezier(.34,1.4,.64,1), fill 0.5s ease, opacity 0.5s ease; }
+  .bubble{ transition: r 0.7s cubic-bezier(.34,1.4,.64,1), fill 0.5s ease; stroke:#fff; stroke-width:2; }
+  .bubble.pulse{ animation: pulseAnim .7s ease; }
+  @keyframes pulseAnim{
+    0%{ filter:drop-shadow(0 0 0 rgba(124,77,255,0)); }
+    40%{ filter:drop-shadow(0 0 14px rgba(124,77,255,0.55)); }
+    100%{ filter:drop-shadow(0 0 0 rgba(124,77,255,0)); }
+  }
+  .region-label{
+    font-family:'Pretendard',sans-serif; font-size:12.5px; font-weight:700;
+    fill:var(--ink); pointer-events:none;
+  }
+  .legend{ display:flex; flex-wrap:wrap; gap:14px; margin:10px 4px 2px; font-size:13px; color:var(--ink-soft); }
+  .legend span{ display:inline-flex; align-items:center; gap:6px; }
+  .swatch{ width:13px; height:13px; border-radius:50%; display:inline-block; border:1px solid rgba(0,0,0,.15); }
+
+  /* decision */
+  .tag{ display:inline-block; font-size:12.5px; font-weight:800; padding:4px 12px; border-radius:999px; margin-bottom:14px; letter-spacing:.02em; }
+  .tag.christian{ background:#FCEBC4; color:var(--gold-deep); }
+  .tag.islamic{ background:#D6F1E5; color:var(--islamic-deep); }
+  .tag.bg{ background:#E9E3F5; color:var(--accent-deep); }
+  .year{ font-family:'Nanum Myeongjo',serif; font-weight:800; font-size:23px; margin-bottom:3px; }
+  .title{ font-size:19px; font-weight:800; margin-bottom:11px; }
+  .context{ margin-bottom:10px; }
+  .source-note{
+    font-size:13.5px; color:var(--ink-soft); background:var(--paper-deep);
+    border-left:4px solid var(--gold); padding:9px 13px; border-radius:0 10px 10px 0; margin-bottom:18px;
+  }
+  .option{
+    display:block; width:100%; text-align:left; background:#fffefb;
+    border:1.8px solid var(--line); border-radius:14px; padding:15px 17px; margin-bottom:10px;
+    font-size:16px; font-weight:600; font-family:'Pretendard',sans-serif; cursor:pointer;
+    transition:.15s; min-height:54px;
+  }
+  .option:hover{ border-color:var(--accent); background:#F5F1FF; transform:translateX(2px); }
+  .option:disabled{ opacity:.5; cursor:default; transform:none; }
+  .option.picked{ border-color:var(--accent); background:#EFE7FF; box-shadow:var(--shadow); }
+  .result-box{
+    margin-top:16px; background:#F6F1E2; border:1.8px solid var(--gold);
+    border-radius:14px; padding:15px 17px;
+  }
+  .result-box .flag{ font-size:12.5px; font-weight:800; color:var(--danger); margin-bottom:5px; display:block; }
+
+  .maps-compare{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media (max-width:640px){ .maps-compare{grid-template-columns:1fr;} }
+  .diff-item{ background:#fffefb; border:1.5px solid var(--line); border-radius:12px; padding:11px 15px; margin-bottom:9px; font-size:14.5px; }
+  .diff-item.same{ color:var(--ink-soft); }
+  .diff-item.diff{ border-left:5px solid var(--danger); font-weight:600; }
+  .diff-item.allsame{ border-left:5px solid var(--gold); }
+
+  footer.foot{ text-align:center; color:var(--ink-soft); font-size:13px; margin-top:34px; }
+  .foot-link{ color:var(--ink-soft); text-decoration:underline; cursor:pointer; background:none; border:none; font-size:13px; font-family:inherit; }
+
+  .progress{ display:flex; gap:6px; margin-bottom:18px; }
+  .progress .dot{ flex:1; height:7px; border-radius:5px; background:var(--line); }
+  .progress .dot.done{ background:var(--accent); }
+  .progress .dot.now{ background:var(--gold); }
+
+  .hidden{ display:none !important; }
+  .small{ font-size:13.5px; color:var(--ink-soft); }
+  .center{ text-align:center; }
+
+  /* modal */
+  .modal-backdrop{
+    position:fixed; inset:0; background:rgba(46,42,56,0.45); display:flex;
+    align-items:center; justify-content:center; z-index:50; padding:20px;
+  }
+  .modal{
+    background:var(--card); border-radius:18px; padding:26px; max-width:380px; width:100%;
+    box-shadow:var(--shadow-lg);
+  }
+
+  /* dashboard */
+  .stat-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:18px; }
+  @media (max-width:600px){ .stat-grid{grid-template-columns:1fr;} }
+  .stat-box{ background:var(--paper-deep); border-radius:14px; padding:16px; text-align:center; }
+  .stat-box .num{ font-family:'Nanum Myeongjo',serif; font-size:30px; font-weight:800; color:var(--accent-deep); }
+  .stat-box .lab{ font-size:13px; color:var(--ink-soft); margin-top:2px; }
+  .bar-row{ margin-bottom:12px; }
+  .bar-row .bar-label{ font-size:14px; font-weight:700; margin-bottom:5px; }
+  .bar-track{ background:var(--paper-deep); border-radius:8px; height:20px; overflow:hidden; display:flex; }
+  .bar-real{ background:var(--gold); height:100%; }
+  .bar-alt{ background:var(--arian); height:100%; }
+  .bar-caption{ font-size:12.5px; color:var(--ink-soft); margin-top:4px; }
+  table.subtable{ width:100%; border-collapse:collapse; font-size:14.5px; }
+  table.subtable th, table.subtable td{ text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); }
+  table.subtable th{ color:var(--ink-soft); font-weight:700; font-size:13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <div class="eyebrow">2학년 세계사 · 크리스트교와 이슬람 세계</div>
+      <h1>세력권 전략 시뮬레이션</h1>
+    </div>
+    <span class="badge" id="sideBadge">진영 미선택</span>
+  </header>
+
+  <!-- SETUP -->
+  <div id="screen-setup">
+    <div class="banner">
+      <strong>⚠ 이 게임은 가상 시나리오입니다.</strong> 여러분이 실제 역사와 다른 선택을 했다면 유럽·서아시아의 세력권 지도가
+      어떻게 바뀌었을지 알아보는 시뮬레이션이에요. 갈림길마다 <strong>실제로 있었던 선택</strong>과 <strong>가상의 대안</strong>이
+      함께 제시돼요. 끝나면 여러분의 지도와 <strong>실제 역사 지도</strong>를 나란히 비교합니다.
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:19px; margin-bottom:14px;">① 내 정보 입력</h2>
+      <div class="id-row">
+        <div class="field">
+          <label for="grade">학년</label>
+          <select id="grade">
+            <option value="1">1학년</option>
+            <option value="2" selected>2학년</option>
+            <option value="3">3학년</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="classNo">반</label>
+          <input type="number" id="classNo" min="1" max="20" placeholder="예: 5">
+        </div>
+        <div class="field">
+          <label for="numberNo">번호</label>
+          <input type="number" id="numberNo" min="1" max="40" placeholder="예: 3">
+        </div>
+      </div>
+      <p class="small" id="idPreview" style="margin:-4px 0 14px;">학번 코드: -</p>
+      <div class="field">
+        <label for="studentName">이름</label>
+        <input type="text" id="studentName" placeholder="예: 홍길동">
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:19px;">② 진영 선택</h2>
+      <p class="small">고른 진영의 갈림길 4곳에서 직접 선택하고, 반대 진영의 4곳은 실제 역사 그대로 진행돼요.</p>
+      <div class="side-select">
+        <div class="side-btn christian" id="btnChristian" onclick="selectSide('christian')">
+          <span class="name">크리스트교 세계</span>
+          <span class="desc">프랑크 왕국 · 교황 · 비잔티움 제국의 입장에서 4개의 갈림길을 선택합니다.</span>
+        </div>
+        <div class="side-btn islam" id="btnIslam" onclick="selectSide('islam')">
+          <span class="name">이슬람 세계</span>
+          <span class="desc">우마이야 · 아바스 · 셀주크의 입장에서 4개의 갈림길을 선택합니다.</span>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn" id="startBtn" onclick="startGame()" disabled>시뮬레이션 시작</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLAY -->
+  <div id="screen-play" class="hidden">
+    <div class="progress" id="progressBar"></div>
+
+    <div class="map-panel">
+      <h3>현재 세력권 지도</h3>
+      <svg class="gamemap" id="mapSvg" viewBox="0 0 800 520" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div class="legend" id="legend"></div>
+    </div>
+
+    <div class="card" id="stepCard"></div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div id="screen-summary" class="hidden">
+    <div class="card">
+      <h2 style="font-size:20px; margin-bottom:6px;">게임 종료 — 지도 비교</h2>
+      <p class="small">내가 만든 지도와 실제 역사 지도를 비교해 보세요. 다른 지역이 있다면, 왜 실제 역사는 그렇게 됐을지 생각해봐요.</p>
+      <div class="maps-compare" style="margin-top:16px;">
+        <div>
+          <h3 style="font-size:13.5px; color:var(--ink-soft); margin-bottom:8px;">내가 만든 지도</h3>
+          <svg class="gamemap" id="mapSvgMine" viewBox="0 0 800 520" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+        <div>
+          <h3 style="font-size:13.5px; color:var(--ink-soft); margin-bottom:8px;">실제 역사 지도</h3>
+          <svg class="gamemap" id="mapSvgReal" viewBox="0 0 800 520" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+      </div>
+      <div class="legend" id="legend2"></div>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size:17px; margin-bottom:10px;">차이가 나는 지점</h3>
+      <div id="diffList"></div>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size:17px; margin-bottom:6px;">한 줄 남기기</h3>
+      <p class="small" style="margin-bottom:10px;">오늘 게임에서 발견한 것을 한두 문장으로만 남겨줘. (자세한 이야기는 이어지는 패들렛 활동에서 써요)</p>
+      <textarea id="reflection" placeholder="예: 732년에 후퇴를 선택하니 서유럽이 이슬람권에 들어가더라. 실제로 막아낸 게 이후 유럽사에 꽤 큰 영향을 준 것 같다."></textarea>
+    </div>
+
+    <div class="actions">
+      <button class="btn" id="submitBtn" onclick="submitResult()">결과 제출하기</button>
+    </div>
+    <div id="submitStatus" class="small center" style="margin-top:10px;"></div>
+  </div>
+
+  <!-- DONE -->
+  <div id="screen-done" class="hidden">
+    <div class="card center">
+      <h2 style="margin-bottom:10px;">제출 완료!</h2>
+      <p>수고했어요. 선생님께 여러분의 선택과 생각이 전달됐어요.</p>
+      <p class="small" style="margin-top:8px;">이제 이어지는 패들렛 글쓰기에서 오늘 느낀 점을 조금 더 풀어서 써 봐요.</p>
+    </div>
+  </div>
+
+  <!-- TEACHER DASHBOARD -->
+  <div id="screen-dashboard" class="hidden">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <h2 style="font-size:20px;">교사용 대시보드</h2>
+        <button class="btn ghost small" onclick="exitDashboard()">← 게임 화면으로</button>
+      </div>
+    </div>
+    <div class="card" id="dashStats"></div>
+    <div class="card">
+      <h3 style="font-size:16px; margin-bottom:12px;">결정 포인트별 선택 분포</h3>
+      <div id="dashBars"></div>
+    </div>
+    <div class="card">
+      <h3 style="font-size:16px; margin-bottom:12px;">제출 목록</h3>
+      <div style="overflow-x:auto;"><table class="subtable" id="dashTable"></table></div>
+    </div>
+  </div>
+
+  <footer class="foot">
+    2학년 세계사 · 크리스트교 단원 3차시 · 세력권 전략 시뮬레이션 ·
+    <button class="foot-link" onclick="openTeacherGate()">교사용 대시보드</button>
+  </footer>
+</div>
+
+<!-- password modal -->
+<div id="teacherModal" class="modal-backdrop hidden">
+  <div class="modal">
+    <h3 style="font-size:18px; margin-bottom:12px;">교사 확인</h3>
+    <p class="small" style="margin-bottom:12px;">비밀번호를 입력하면 대시보드로 이동해요.</p>
+    <input type="password" id="teacherPw" placeholder="비밀번호">
+    <div class="actions">
+      <button class="btn ghost small" onclick="closeTeacherGate()">취소</button>
+      <button class="btn small" onclick="checkTeacherPw()">확인</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   CONFIG
+   ========================================================= */
+const CONFIG = {
+  SHEET_WEBAPP_URL: "",       // Apps Script 배포 후 웹앱 URL을 넣으세요
+  TEACHER_PASSWORD: "history2026", // 교사용 화면 진입 비밀번호 (화면단 보호 — 원할 시 자유롭게 바꾸세요)
+};
+
+/* =========================================================
+   지도 데이터 — 실제 해안선(Natural Earth 50m, 단순화) + 실제 도시 좌표
+   ========================================================= */
+const LAND_PATH = "M 307.1,349.5 L 305.1,351.1 L 303.0,350.4 L 303.3,348.3 L 305.6,348.2 L 307.1,349.5 Z M 361.6,298.5 L 363.1,299.8 L 362.3,300.3 L 363.8,301.9 L 363.9,303.1 L 361.9,304.9 L 361.5,307.8 L 357.0,307.5 L 353.4,306.2 L 351.6,303.7 L 348.6,301.8 L 345.4,301.9 L 335.6,296.4 L 332.3,295.1 L 328.5,294.7 L 325.8,291.5 L 327.3,288.1 L 329.8,286.2 L 332.0,288.4 L 335.5,286.1 L 337.2,286.1 L 343.9,289.2 L 347.3,288.3 L 353.4,288.2 L 357.2,286.5 L 361.6,286.7 L 367.6,284.6 L 368.5,285.0 L 363.1,292.0 L 361.3,296.7 L 361.6,298.5 Z M 181.6,273.9 L 178.8,276.5 L 176.3,275.8 L 178.0,273.3 L 181.5,273.2 L 181.6,273.9 Z M 201.0,270.1 L 197.3,268.9 L 196.0,266.6 L 193.3,267.5 L 191.6,265.6 L 198.7,261.3 L 202.6,260.6 L 201.9,263.0 L 205.3,263.2 L 206.2,264.4 L 203.3,268.9 L 201.0,270.1 Z M 217.0,262.5 L 211.6,260.6 L 211.4,259.1 L 216.3,259.5 L 217.6,261.5 L 217.0,262.5 Z M 289.4,259.8 L 287.5,272.0 L 286.5,272.4 L 280.8,271.0 L 279.6,275.0 L 277.3,275.7 L 274.6,275.0 L 272.2,271.5 L 272.0,267.5 L 272.7,264.0 L 273.9,263.9 L 274.0,262.3 L 272.1,261.2 L 273.0,255.8 L 271.4,252.8 L 269.2,250.6 L 269.7,246.8 L 271.5,247.8 L 274.3,247.7 L 277.6,246.3 L 283.0,241.8 L 288.2,245.3 L 287.4,246.5 L 289.1,248.2 L 290.7,252.8 L 288.6,256.1 L 289.4,259.8 Z M 285.3,235.0 L 282.5,240.0 L 277.4,237.1 L 278.5,235.4 L 276.2,234.6 L 276.5,232.2 L 275.0,232.1 L 276.0,229.7 L 274.5,228.8 L 274.2,228.0 L 275.7,227.0 L 274.2,225.9 L 277.5,222.3 L 281.8,220.5 L 284.2,220.8 L 284.4,217.5 L 285.5,216.4 L 286.2,216.9 L 286.1,221.6 L 287.0,223.1 L 287.4,228.8 L 285.3,232.2 L 285.3,235.0 Z M 383.8,212.8 L 379.0,212.1 L 379.3,211.1 L 385.2,212.1 L 383.8,212.8 Z M 351.4,185.4 L 352.9,188.2 L 353.1,193.2 L 350.8,189.2 L 351.2,187.5 L 350.5,185.7 L 351.4,185.4 Z M 357.5,188.1 L 355.8,188.4 L 352.5,186.4 L 354.3,184.5 L 357.5,188.1 Z M 145.8,105.6 L 143.3,107.1 L 139.2,105.9 L 142.5,104.4 L 145.8,105.6 Z M 99.1,66.6 L 102.5,66.2 L 104.6,67.8 L 106.0,67.8 L 101.7,70.3 L 99.3,68.5 L 99.1,66.6 Z M 78.3,40.2 L 80.2,42.9 L 83.8,46.0 L 83.9,46.8 L 81.6,47.9 L 81.6,48.5 L 85.6,48.2 L 87.1,50.6 L 86.9,51.4 L 84.4,49.8 L 84.6,52.3 L 85.9,52.4 L 85.2,53.8 L 82.3,54.4 L 79.7,57.0 L 77.1,56.5 L 77.9,57.5 L 75.4,58.0 L 78.1,63.9 L 78.0,66.9 L 79.6,73.3 L 77.7,76.0 L 77.1,78.8 L 73.8,81.7 L 75.7,83.1 L 68.1,84.4 L 67.1,83.1 L 66.6,84.3 L 59.6,85.2 L 58.3,86.8 L 55.0,87.6 L 52.6,89.2 L 47.9,88.3 L 48.9,89.7 L 47.9,90.8 L 36.0,93.9 L 33.8,93.5 L 28.9,94.1 L 33.0,91.3 L 32.3,91.2 L 25.1,92.4 L 32.0,88.5 L 25.5,90.0 L 22.1,89.6 L 21.6,88.6 L 27.9,84.9 L 21.5,84.7 L 21.9,83.7 L 24.9,82.6 L 29.7,83.1 L 27.9,80.8 L 31.6,78.8 L 42.9,76.8 L 40.1,75.8 L 37.7,77.5 L 32.5,77.2 L 27.8,78.4 L 33.8,74.8 L 34.8,73.7 L 33.8,73.0 L 36.0,70.8 L 40.9,69.2 L 33.1,68.8 L 31.7,67.4 L 28.3,67.3 L 29.4,66.5 L 25.4,66.3 L 25.9,65.3 L 25.1,64.3 L 30.4,63.5 L 27.9,62.7 L 28.0,61.7 L 32.3,60.6 L 32.3,59.5 L 27.8,59.7 L 28.6,56.4 L 27.5,56.7 L 27.0,55.1 L 25.4,55.5 L 25.9,54.1 L 32.5,53.3 L 35.8,53.5 L 38.1,54.7 L 40.0,53.6 L 46.1,54.3 L 45.0,52.8 L 50.3,50.5 L 51.6,48.5 L 47.2,49.0 L 43.1,47.9 L 43.8,47.2 L 48.3,44.9 L 48.1,43.0 L 49.7,41.2 L 56.7,40.6 L 56.5,39.7 L 57.8,39.6 L 59.2,41.6 L 57.9,43.8 L 58.9,43.4 L 60.3,42.7 L 59.8,39.8 L 62.6,39.0 L 61.8,38.1 L 67.2,39.9 L 64.4,41.4 L 63.8,42.0 L 64.3,42.5 L 66.3,42.2 L 67.4,40.7 L 73.7,39.9 L 78.3,40.2 Z M 102.2,53.9 L 98.5,56.9 L 96.2,56.7 L 97.4,54.5 L 99.9,52.3 L 101.6,52.1 L 102.2,53.9 Z M 108.6,2.6 L 105.6,4.7 L 104.9,6.1 L 116.1,4.2 L 119.5,4.7 L 132.3,4.3 L 135.1,5.6 L 136.3,7.6 L 133.1,10.7 L 129.9,16.4 L 126.7,19.7 L 124.3,21.5 L 115.9,23.6 L 121.5,23.1 L 124.6,24.3 L 124.3,25.2 L 120.3,26.1 L 115.2,28.5 L 109.5,27.5 L 111.9,28.7 L 119.4,29.6 L 122.2,28.5 L 125.3,28.5 L 131.4,30.3 L 137.9,35.1 L 143.6,47.6 L 151.0,50.5 L 158.9,56.1 L 157.3,57.5 L 161.5,63.4 L 156.4,61.6 L 151.2,61.8 L 156.1,62.2 L 161.7,65.5 L 163.6,67.4 L 164.7,69.9 L 160.6,73.6 L 163.7,75.0 L 165.1,74.7 L 167.5,72.7 L 174.1,72.8 L 178.4,73.8 L 182.1,75.8 L 183.3,79.9 L 181.2,84.9 L 178.8,86.7 L 176.4,87.1 L 177.0,88.9 L 175.8,89.5 L 172.7,89.4 L 170.0,90.6 L 172.0,91.2 L 171.9,92.9 L 165.7,94.4 L 167.0,94.1 L 169.2,95.5 L 171.9,95.9 L 178.9,95.9 L 178.2,98.9 L 173.9,100.4 L 172.8,102.2 L 170.3,102.1 L 162.7,104.5 L 157.3,103.8 L 149.5,104.5 L 141.1,102.6 L 142.2,103.7 L 138.7,105.0 L 132.9,105.1 L 133.8,106.5 L 132.9,106.8 L 128.7,106.3 L 127.6,106.9 L 120.0,105.2 L 114.6,106.4 L 110.9,112.1 L 109.4,112.2 L 104.1,109.9 L 97.0,111.4 L 93.2,113.2 L 91.8,115.0 L 90.3,115.2 L 87.5,114.0 L 84.6,114.4 L 85.7,112.7 L 88.8,112.0 L 94.8,107.8 L 98.9,104.3 L 99.7,101.4 L 102.7,100.7 L 104.2,98.4 L 108.8,97.8 L 118.2,98.1 L 127.6,90.4 L 116.1,95.5 L 112.5,95.1 L 108.1,92.6 L 103.5,92.9 L 105.5,91.6 L 101.5,90.4 L 98.7,90.5 L 94.6,92.1 L 91.7,90.9 L 90.7,88.7 L 89.8,88.4 L 92.2,86.7 L 101.6,83.8 L 104.7,82.0 L 106.9,78.8 L 105.6,77.9 L 106.1,76.5 L 105.1,74.8 L 105.3,73.4 L 97.6,75.0 L 98.2,73.8 L 103.1,70.1 L 109.8,67.8 L 115.7,67.2 L 118.7,68.5 L 117.8,66.5 L 119.1,66.1 L 121.1,67.8 L 123.3,67.7 L 121.2,67.2 L 119.1,64.8 L 121.0,61.6 L 119.6,61.0 L 119.4,60.0 L 119.6,59.1 L 121.3,58.3 L 121.8,55.2 L 117.8,55.9 L 112.4,51.0 L 112.1,49.6 L 113.8,46.6 L 116.4,44.7 L 119.5,44.0 L 112.7,44.1 L 107.2,46.5 L 104.9,46.5 L 103.3,45.5 L 99.8,46.8 L 95.8,45.6 L 94.5,47.8 L 91.5,45.4 L 91.0,43.5 L 92.6,43.5 L 97.6,36.1 L 97.0,34.7 L 94.8,33.2 L 95.0,30.7 L 95.9,29.8 L 98.9,29.8 L 95.4,28.1 L 96.0,26.6 L 94.3,28.5 L 90.3,30.5 L 90.4,27.9 L 93.4,25.5 L 92.2,26.0 L 87.9,29.0 L 88.2,32.2 L 85.9,37.7 L 85.1,38.5 L 83.6,38.5 L 83.1,37.6 L 84.2,34.3 L 86.6,31.7 L 85.0,31.6 L 85.2,28.1 L 88.1,21.5 L 90.8,17.9 L 84.6,21.2 L 81.8,20.8 L 80.4,18.9 L 78.2,18.7 L 83.6,16.6 L 81.8,15.9 L 85.4,13.0 L 85.8,11.1 L 82.4,8.1 L 85.6,6.5 L 84.3,6.2 L 83.4,4.8 L 85.2,1.7 L 91.2,1.7 L 89.0,0.0 L 108.1,0.0 L 106.8,0.6 L 106.2,2.1 L 108.6,2.6 Z M 335.7,49.9 L 336.5,48.6 L 339.0,47.7 L 339.9,48.9 L 342.1,49.7 L 341.1,51.1 L 343.1,53.2 L 342.8,53.7 L 339.8,52.9 L 338.2,54.2 L 335.9,53.1 L 335.7,49.9 Z M 307.4,44.2 L 310.1,44.0 L 313.8,45.8 L 316.5,46.1 L 316.9,48.0 L 312.8,48.7 L 307.1,46.6 L 307.4,44.2 Z M 302.5,47.0 L 301.6,45.5 L 306.0,41.1 L 303.5,46.2 L 302.5,47.0 Z M 355.8,41.9 L 356.9,39.0 L 361.8,41.2 L 361.8,42.1 L 360.7,43.3 L 355.8,41.9 Z M 292.9,40.4 L 291.5,38.2 L 291.5,35.9 L 297.1,34.5 L 300.1,35.3 L 301.9,34.5 L 304.3,38.7 L 303.8,41.4 L 301.7,42.6 L 296.7,42.1 L 292.9,40.4 Z M 321.2,40.6 L 320.7,46.0 L 318.2,46.6 L 316.5,44.6 L 315.4,40.6 L 310.5,40.4 L 308.9,38.6 L 309.2,36.6 L 308.3,34.7 L 306.8,34.0 L 306.4,32.9 L 311.0,32.5 L 313.0,29.7 L 315.0,29.5 L 315.9,30.2 L 315.9,32.8 L 317.6,33.3 L 319.1,30.4 L 318.2,29.3 L 320.5,28.1 L 324.3,27.1 L 327.7,28.0 L 328.1,28.4 L 327.0,30.1 L 327.6,33.4 L 324.3,34.8 L 322.9,36.6 L 325.1,37.8 L 325.5,39.2 L 321.2,40.6 Z M 90.9,33.4 L 91.9,36.9 L 88.9,36.4 L 88.4,33.7 L 89.1,33.1 L 90.9,33.4 Z M 76.0,32.1 L 73.4,33.3 L 74.5,31.0 L 78.3,29.9 L 79.3,33.3 L 75.9,34.6 L 76.0,32.1 Z M 80.8,28.2 L 83.7,27.2 L 80.4,31.6 L 79.2,31.4 L 79.4,30.0 L 81.2,29.3 L 80.4,29.0 L 80.8,28.2 Z M 78.2,19.5 L 83.2,21.8 L 83.0,23.9 L 75.8,24.6 L 77.5,23.7 L 78.1,21.8 L 75.9,20.9 L 75.9,20.2 L 78.2,19.5 Z M 387.0,9.5 L 388.2,9.8 L 383.7,17.3 L 380.4,24.7 L 379.1,25.4 L 378.8,20.7 L 381.7,16.2 L 383.0,15.9 L 387.0,9.5 Z M 63.4,12.6 L 61.1,11.7 L 61.2,8.9 L 63.1,9.1 L 63.4,12.6 Z M 84.1,11.6 L 80.2,13.8 L 79.5,11.5 L 75.7,11.5 L 74.1,9.7 L 71.0,9.2 L 69.9,8.1 L 72.2,7.1 L 71.8,6.3 L 75.0,5.7 L 75.9,4.7 L 77.8,6.0 L 78.2,9.9 L 83.9,10.6 L 84.1,11.6 Z M 409.3,10.9 L 405.2,13.2 L 404.5,14.8 L 402.0,15.6 L 403.8,13.2 L 401.4,10.5 L 402.0,9.5 L 401.8,6.4 L 407.2,2.4 L 410.7,2.4 L 412.0,1.2 L 414.4,2.4 L 410.9,4.2 L 410.5,7.5 L 412.1,8.7 L 410.5,9.2 L 409.3,10.9 Z M 60.4,5.0 L 63.9,4.6 L 65.4,5.4 L 64.2,6.7 L 59.8,5.7 L 60.4,5.0 Z M 73.8,0.0 L 67.2,3.6 L 65.6,2.7 L 68.6,1.1 L 66.0,0.0 L 73.8,0.0 Z M 605.5,335.8 L 600.8,336.9 L 600.1,338.4 L 598.2,337.1 L 595.9,337.3 L 592.7,336.1 L 590.9,332.9 L 590.7,331.0 L 591.9,331.5 L 595.4,329.6 L 598.4,329.6 L 599.2,326.6 L 608.1,327.1 L 620.7,322.7 L 612.6,328.0 L 612.1,329.3 L 614.0,332.4 L 609.3,332.7 L 605.5,335.8 Z M 483.4,325.5 L 484.7,327.0 L 489.6,326.1 L 499.7,327.8 L 503.1,327.2 L 503.3,330.2 L 503.9,330.4 L 508.9,329.1 L 510.9,327.7 L 509.9,331.6 L 508.9,332.0 L 490.7,333.2 L 489.9,332.9 L 489.5,330.9 L 486.2,329.9 L 475.2,328.8 L 474.2,328.0 L 474.0,326.2 L 474.3,324.5 L 474.8,324.0 L 475.6,324.8 L 476.5,322.8 L 478.0,324.5 L 480.2,324.6 L 482.2,323.6 L 482.6,324.5 L 481.5,325.1 L 483.4,325.5 Z M 536.4,311.5 L 534.2,315.9 L 534.5,316.8 L 529.9,319.1 L 529.6,315.3 L 530.9,313.8 L 535.6,311.6 L 536.4,311.5 Z M 516.6,291.6 L 520.5,292.2 L 520.7,293.1 L 517.9,294.0 L 514.4,292.9 L 516.6,291.6 Z M 439.9,293.1 L 438.8,292.8 L 437.6,293.7 L 434.9,291.0 L 435.9,289.9 L 439.9,293.1 Z M 433.0,285.7 L 431.4,286.3 L 432.1,284.0 L 433.6,284.1 L 434.2,282.0 L 435.0,285.0 L 437.2,286.8 L 437.1,287.6 L 433.6,287.3 L 433.0,285.7 Z M 508.8,281.1 L 508.8,284.5 L 506.6,286.6 L 505.0,285.0 L 506.6,283.8 L 504.6,280.6 L 506.8,280.2 L 508.8,281.1 Z M 482.7,281.1 L 483.7,285.7 L 487.8,287.1 L 487.2,289.2 L 482.8,287.2 L 480.5,283.3 L 475.3,282.5 L 474.9,280.9 L 470.0,277.3 L 464.9,276.3 L 470.8,273.9 L 473.7,277.1 L 478.4,279.0 L 481.3,279.2 L 482.7,281.1 Z M 511.9,274.8 L 508.1,273.3 L 510.3,271.6 L 509.0,271.6 L 507.6,273.1 L 504.6,271.6 L 505.5,270.3 L 511.3,268.9 L 514.6,273.7 L 513.2,273.4 L 514.0,274.5 L 511.9,274.8 Z M 424.8,264.4 L 425.7,267.1 L 428.0,269.0 L 425.1,267.8 L 422.0,263.4 L 424.5,262.6 L 425.8,263.7 L 424.8,264.4 Z M 495.0,262.5 L 494.2,262.1 L 494.1,260.0 L 496.5,259.9 L 497.1,260.6 L 499.3,259.5 L 498.1,262.8 L 496.8,262.6 L 496.7,261.5 L 495.0,262.5 Z M 488.6,251.6 L 486.9,250.1 L 488.3,248.5 L 489.6,248.6 L 490.5,249.8 L 490.3,251.1 L 488.6,251.6 Z M 382.6,1.2 L 381.3,1.3 L 380.7,2.7 L 382.0,7.2 L 379.7,10.6 L 380.4,13.5 L 378.0,18.6 L 375.3,21.7 L 373.3,25.7 L 371.0,27.1 L 368.4,26.2 L 357.1,26.6 L 356.2,27.0 L 356.7,28.4 L 354.1,28.2 L 349.5,31.3 L 349.4,32.8 L 351.2,35.7 L 349.0,37.6 L 344.1,37.1 L 337.6,38.3 L 331.8,37.4 L 332.5,36.4 L 333.0,32.5 L 326.3,24.7 L 329.4,25.5 L 330.7,25.1 L 328.8,22.5 L 331.4,22.4 L 332.3,21.4 L 331.8,20.0 L 329.6,19.3 L 325.6,15.8 L 322.0,11.2 L 320.7,8.0 L 319.5,8.3 L 318.4,4.6 L 316.5,4.1 L 316.0,0.4 L 314.1,0.0 L 382.6,0.0 L 382.6,1.2 Z M 800.0,224.8 L 800.0,410.1 L 796.3,413.2 L 800.0,413.3 L 800.0,520.0 L 680.2,520.0 L 681.3,514.3 L 680.1,508.9 L 678.4,507.3 L 679.2,507.3 L 677.3,504.9 L 672.9,495.3 L 670.5,492.4 L 665.6,488.4 L 660.6,486.9 L 655.7,479.3 L 656.9,477.2 L 655.3,472.5 L 652.3,467.4 L 650.2,465.8 L 649.0,461.7 L 646.9,460.7 L 643.3,453.6 L 634.4,441.5 L 632.3,437.2 L 629.1,432.8 L 623.0,431.4 L 621.7,432.4 L 621.5,431.2 L 623.7,426.0 L 626.3,410.9 L 623.2,415.0 L 621.6,422.4 L 619.3,428.2 L 618.7,433.1 L 616.3,436.7 L 613.9,435.8 L 610.1,432.6 L 603.3,425.1 L 601.7,419.2 L 596.3,411.4 L 594.2,404.8 L 593.0,405.5 L 593.2,406.6 L 591.5,409.8 L 594.7,414.2 L 595.5,419.9 L 602.7,430.3 L 607.3,434.8 L 607.3,439.0 L 611.3,445.1 L 612.8,452.8 L 620.9,466.7 L 629.3,484.2 L 633.0,488.9 L 637.1,492.0 L 633.9,492.3 L 633.4,494.3 L 633.6,499.2 L 636.0,506.3 L 638.8,509.3 L 643.1,510.9 L 645.5,514.3 L 651.1,518.6 L 651.6,520.0 L 0.0,520.0 L 0.0,431.5 L 7.6,427.8 L 12.3,423.0 L 20.2,418.0 L 28.6,407.2 L 31.1,402.9 L 31.7,399.4 L 28.3,394.1 L 29.2,383.9 L 31.0,379.7 L 35.4,374.3 L 36.7,367.3 L 46.5,357.5 L 68.0,347.1 L 75.3,335.5 L 81.0,320.9 L 85.0,320.2 L 88.0,318.8 L 89.6,319.2 L 88.8,319.8 L 88.8,321.5 L 90.0,323.3 L 95.5,328.2 L 98.3,329.2 L 102.3,329.9 L 110.8,328.2 L 114.7,329.2 L 117.3,328.8 L 120.4,326.3 L 122.1,330.4 L 134.5,330.9 L 142.2,327.0 L 147.8,322.6 L 154.3,319.8 L 159.4,320.2 L 162.0,316.9 L 164.2,315.4 L 176.8,310.3 L 194.6,309.1 L 199.6,306.4 L 206.9,306.3 L 210.4,304.8 L 223.4,304.8 L 230.6,308.4 L 240.9,305.3 L 243.3,304.2 L 244.4,302.7 L 246.5,302.1 L 247.7,303.3 L 252.4,304.5 L 256.5,303.8 L 256.1,302.0 L 259.1,302.5 L 265.5,305.4 L 277.6,303.4 L 281.9,300.5 L 289.2,298.4 L 291.2,298.9 L 290.5,300.3 L 291.1,301.4 L 292.0,300.7 L 291.7,299.7 L 296.0,300.4 L 295.9,302.8 L 297.8,305.3 L 297.2,306.5 L 298.8,307.2 L 301.0,305.1 L 303.5,304.3 L 306.0,302.5 L 307.4,302.3 L 308.4,305.2 L 306.2,307.0 L 304.0,310.7 L 301.9,311.7 L 299.8,314.1 L 300.1,317.3 L 301.2,319.4 L 306.7,323.1 L 307.2,327.4 L 308.3,328.8 L 302.5,336.9 L 294.2,343.6 L 294.0,345.9 L 295.5,348.8 L 297.4,350.6 L 299.4,351.5 L 302.8,351.2 L 303.0,353.7 L 305.3,353.4 L 306.1,352.1 L 307.8,353.0 L 308.7,355.8 L 310.1,356.7 L 309.4,357.5 L 317.5,359.8 L 323.7,363.2 L 330.0,364.0 L 337.1,362.3 L 348.7,365.3 L 353.5,368.2 L 362.4,369.9 L 364.8,373.2 L 364.8,376.0 L 366.6,380.5 L 369.4,383.8 L 375.0,386.2 L 383.8,386.9 L 397.7,391.0 L 402.5,393.2 L 408.9,398.4 L 412.5,400.2 L 417.2,400.3 L 421.2,398.5 L 426.8,392.9 L 428.7,388.9 L 428.5,387.2 L 426.1,382.0 L 425.7,378.2 L 426.3,375.6 L 428.3,372.4 L 434.9,367.2 L 440.8,364.4 L 445.7,364.0 L 449.6,361.9 L 455.8,362.3 L 467.9,366.6 L 468.1,370.8 L 470.5,372.5 L 477.3,373.3 L 481.7,375.4 L 491.7,375.8 L 493.7,377.2 L 496.3,382.3 L 498.4,382.6 L 505.2,381.0 L 516.9,383.2 L 523.3,384.5 L 527.2,386.9 L 531.1,387.2 L 532.9,388.6 L 540.2,389.3 L 547.6,392.5 L 552.4,391.0 L 559.1,386.7 L 563.0,386.3 L 565.3,383.4 L 572.3,381.8 L 567.5,384.0 L 573.4,383.3 L 574.4,381.3 L 580.3,383.4 L 585.2,382.2 L 588.5,385.1 L 585.2,383.0 L 583.6,385.8 L 586.8,386.8 L 588.0,388.7 L 590.4,387.1 L 590.0,385.7 L 594.7,389.0 L 601.7,387.6 L 602.6,388.8 L 608.9,388.1 L 615.7,385.6 L 619.8,381.4 L 622.4,377.1 L 628.1,359.9 L 634.8,346.2 L 635.3,343.1 L 637.4,340.3 L 639.7,338.8 L 638.5,333.0 L 639.2,329.0 L 638.7,326.1 L 636.9,324.0 L 637.9,320.0 L 639.4,317.8 L 637.5,313.3 L 642.5,308.3 L 642.4,306.1 L 640.7,304.6 L 635.5,307.3 L 633.8,309.2 L 631.9,309.5 L 622.7,306.0 L 617.3,309.1 L 612.7,313.5 L 609.3,315.1 L 599.1,316.4 L 597.3,317.3 L 591.7,315.1 L 587.0,310.0 L 576.5,305.9 L 568.6,305.3 L 567.8,306.3 L 567.4,310.2 L 565.9,313.9 L 565.2,314.3 L 563.1,313.3 L 555.9,315.5 L 549.6,313.1 L 548.6,312.0 L 547.2,307.8 L 546.3,307.4 L 544.2,308.0 L 539.8,306.2 L 537.4,306.0 L 534.8,308.4 L 533.6,308.6 L 534.5,306.9 L 527.2,307.9 L 526.2,307.0 L 533.4,305.8 L 536.6,302.9 L 524.7,303.1 L 523.5,303.7 L 523.3,302.2 L 524.0,301.5 L 527.1,301.0 L 526.9,299.7 L 522.9,297.7 L 522.0,294.6 L 520.9,293.8 L 523.0,292.9 L 523.1,289.2 L 518.4,288.1 L 515.8,286.0 L 514.4,286.7 L 510.5,284.9 L 511.2,283.5 L 512.2,283.6 L 511.7,279.9 L 512.6,279.6 L 514.5,280.8 L 514.6,282.8 L 515.7,284.0 L 516.4,282.8 L 518.2,283.5 L 521.9,282.4 L 518.8,281.9 L 516.8,278.6 L 520.2,276.1 L 517.5,275.0 L 518.0,272.8 L 515.8,270.2 L 518.7,266.5 L 508.2,267.7 L 509.1,260.1 L 510.8,259.6 L 516.5,254.2 L 523.8,253.4 L 524.4,254.6 L 526.3,255.4 L 529.7,255.3 L 531.3,254.5 L 529.8,253.0 L 531.7,252.6 L 533.2,252.9 L 532.4,254.5 L 532.8,254.7 L 546.8,254.4 L 547.4,253.9 L 543.8,252.3 L 546.1,250.9 L 558.0,249.0 L 551.5,248.3 L 548.2,246.5 L 547.3,245.4 L 548.6,242.4 L 558.9,243.4 L 564.6,242.7 L 570.8,244.3 L 576.7,244.0 L 579.4,240.9 L 590.8,235.0 L 605.1,230.9 L 623.3,231.7 L 626.8,230.2 L 628.7,230.7 L 628.3,232.7 L 630.6,235.0 L 634.1,236.4 L 638.9,235.2 L 640.7,235.7 L 642.4,239.4 L 645.4,241.6 L 646.8,241.8 L 648.6,240.5 L 650.4,240.3 L 653.2,241.6 L 654.2,242.9 L 671.7,246.6 L 685.7,244.0 L 690.8,245.8 L 696.9,246.1 L 712.2,239.4 L 716.0,235.4 L 716.8,231.5 L 712.3,220.5 L 708.4,219.1 L 707.5,217.7 L 704.5,215.7 L 699.5,214.6 L 691.6,209.8 L 676.2,198.1 L 669.1,196.2 L 664.7,192.1 L 662.7,192.7 L 659.9,192.2 L 656.1,188.2 L 648.4,185.6 L 652.5,183.6 L 649.6,182.4 L 651.5,181.6 L 656.2,183.8 L 662.0,182.3 L 662.3,180.7 L 661.5,180.6 L 661.5,179.6 L 664.5,176.2 L 665.8,173.3 L 666.9,172.6 L 667.7,173.1 L 667.7,174.3 L 669.1,172.0 L 673.2,172.0 L 667.7,167.6 L 665.5,167.5 L 663.6,164.1 L 666.2,164.4 L 669.7,163.2 L 673.3,163.7 L 672.5,161.6 L 683.6,158.3 L 683.9,157.4 L 682.6,155.0 L 680.3,155.0 L 679.0,156.4 L 675.6,156.8 L 674.0,156.7 L 676.8,155.1 L 674.4,155.4 L 669.0,157.7 L 660.6,157.8 L 657.9,160.1 L 654.0,160.7 L 650.6,163.0 L 647.5,162.3 L 643.7,163.8 L 637.7,164.3 L 632.0,167.8 L 629.4,170.9 L 626.9,171.8 L 630.4,169.3 L 630.6,168.0 L 629.7,167.0 L 627.5,169.5 L 624.7,170.6 L 624.8,173.5 L 627.0,177.7 L 632.8,183.2 L 637.8,182.0 L 640.2,182.4 L 642.3,181.2 L 647.7,182.1 L 645.2,186.8 L 638.3,187.7 L 635.7,186.3 L 633.0,186.4 L 627.8,190.6 L 622.9,190.6 L 619.6,191.8 L 617.1,194.4 L 612.1,196.6 L 608.7,196.0 L 606.0,194.2 L 608.2,189.1 L 607.4,186.4 L 605.2,185.1 L 602.5,185.0 L 598.9,182.7 L 594.8,183.0 L 593.4,181.9 L 601.9,177.0 L 608.9,174.1 L 607.9,171.9 L 605.7,172.5 L 602.7,170.8 L 593.0,172.1 L 587.1,169.6 L 584.4,169.3 L 583.7,168.6 L 586.6,168.1 L 586.8,167.1 L 582.8,166.5 L 580.7,165.3 L 591.5,166.5 L 594.4,164.4 L 591.4,165.2 L 587.3,164.1 L 585.9,162.0 L 585.9,159.1 L 583.5,155.8 L 585.5,160.0 L 585.0,163.9 L 580.4,163.7 L 580.8,162.1 L 578.7,164.3 L 570.6,165.4 L 568.8,169.5 L 562.9,175.3 L 557.6,177.2 L 555.0,177.3 L 554.7,179.1 L 555.6,180.0 L 556.4,182.8 L 554.1,190.0 L 547.3,191.3 L 547.3,188.9 L 547.9,188.1 L 545.7,188.3 L 545.2,189.0 L 545.7,190.5 L 544.1,194.1 L 545.2,193.9 L 541.9,198.0 L 542.1,202.5 L 540.8,209.4 L 539.5,211.0 L 535.1,211.0 L 532.4,214.0 L 531.9,220.3 L 530.0,220.9 L 526.5,224.4 L 529.4,226.1 L 533.1,230.4 L 533.2,233.2 L 536.0,237.5 L 547.4,242.2 L 546.1,245.4 L 543.7,245.9 L 535.6,244.4 L 532.3,245.7 L 526.7,245.9 L 523.4,250.1 L 517.0,252.8 L 511.1,258.2 L 509.4,258.9 L 510.1,255.5 L 516.3,252.1 L 517.2,250.9 L 508.1,251.2 L 506.8,248.9 L 504.7,247.8 L 494.7,245.6 L 490.6,247.6 L 486.4,246.3 L 481.1,249.5 L 476.8,249.2 L 476.6,250.2 L 478.4,252.1 L 477.8,253.0 L 478.2,254.0 L 482.8,255.3 L 484.6,257.9 L 482.1,256.0 L 478.8,254.8 L 476.4,255.2 L 476.3,255.9 L 479.6,258.3 L 480.0,259.6 L 479.3,260.5 L 475.5,256.8 L 472.4,256.2 L 471.8,256.8 L 472.4,258.3 L 475.7,260.6 L 475.0,261.1 L 471.9,260.1 L 470.8,256.9 L 465.3,254.2 L 464.7,252.9 L 465.6,251.5 L 461.7,252.8 L 461.2,259.5 L 464.5,262.9 L 466.4,266.3 L 469.8,269.3 L 471.0,271.9 L 468.7,273.0 L 468.3,272.5 L 468.8,270.7 L 466.6,269.7 L 465.6,270.0 L 464.5,270.7 L 465.1,272.0 L 466.2,274.0 L 467.6,273.9 L 464.0,275.9 L 460.9,276.4 L 470.0,279.3 L 471.6,281.3 L 474.3,281.8 L 475.8,283.8 L 479.6,284.9 L 480.8,292.1 L 480.7,293.1 L 479.6,293.6 L 473.8,288.4 L 467.3,290.3 L 468.6,291.8 L 469.3,294.4 L 471.9,295.0 L 473.2,296.6 L 468.8,298.5 L 466.9,296.4 L 463.7,294.9 L 463.0,295.5 L 467.5,305.4 L 467.2,308.5 L 468.8,311.3 L 466.4,310.1 L 463.7,306.4 L 462.9,306.3 L 461.4,306.5 L 459.9,309.6 L 459.9,311.3 L 458.3,310.4 L 458.3,307.6 L 454.4,302.9 L 452.7,303.5 L 451.9,307.1 L 449.8,305.3 L 447.8,302.2 L 447.7,300.4 L 449.2,298.9 L 449.1,297.7 L 447.6,295.5 L 444.4,293.7 L 443.8,292.1 L 441.7,290.5 L 444.1,288.5 L 445.4,286.0 L 448.8,286.4 L 451.0,284.1 L 460.7,287.3 L 464.6,289.4 L 465.6,289.5 L 465.2,288.2 L 468.3,287.8 L 469.1,287.0 L 467.9,286.1 L 464.5,285.5 L 459.0,282.6 L 457.6,283.7 L 452.9,282.9 L 446.3,284.2 L 444.4,281.9 L 444.0,283.5 L 442.4,283.9 L 441.5,283.3 L 439.9,279.4 L 437.0,277.2 L 436.9,276.3 L 437.0,275.5 L 438.6,275.3 L 441.5,275.9 L 442.0,275.6 L 441.6,274.0 L 437.1,274.3 L 430.7,269.7 L 429.2,266.6 L 426.7,264.2 L 424.7,259.4 L 419.8,257.0 L 417.6,254.1 L 419.5,254.1 L 417.8,250.4 L 419.5,246.5 L 419.2,239.4 L 421.0,236.3 L 421.0,234.2 L 415.8,231.9 L 411.9,227.5 L 408.4,225.7 L 408.6,224.7 L 406.9,224.9 L 397.7,219.6 L 387.3,216.5 L 389.6,216.3 L 396.3,218.8 L 385.4,211.0 L 378.6,208.8 L 373.1,209.2 L 372.6,207.2 L 366.7,203.5 L 362.5,199.7 L 361.6,198.5 L 366.3,198.3 L 359.8,193.5 L 358.6,192.0 L 358.8,188.2 L 358.1,186.6 L 354.0,183.5 L 350.8,182.9 L 349.8,185.5 L 346.2,190.2 L 344.8,190.1 L 341.7,186.2 L 340.2,180.8 L 343.8,178.7 L 341.7,176.6 L 339.5,177.5 L 336.1,176.6 L 333.7,178.6 L 325.8,181.0 L 327.1,179.9 L 326.6,179.9 L 323.7,181.3 L 323.0,184.3 L 325.2,187.2 L 327.0,188.2 L 325.1,190.7 L 323.7,190.2 L 323.3,191.8 L 325.3,199.0 L 329.2,202.3 L 340.9,208.4 L 344.1,214.1 L 346.8,221.2 L 353.9,227.6 L 362.2,232.1 L 372.9,232.0 L 375.5,232.6 L 375.4,234.6 L 372.2,236.6 L 372.0,238.2 L 388.0,244.7 L 393.0,247.9 L 399.4,250.5 L 406.1,256.8 L 406.5,258.5 L 404.6,262.6 L 401.0,260.9 L 398.2,256.0 L 391.9,255.1 L 390.1,254.2 L 389.1,252.7 L 387.1,252.6 L 385.7,253.4 L 382.3,258.0 L 380.3,263.6 L 381.3,265.2 L 384.3,266.1 L 388.2,268.9 L 389.0,274.5 L 388.0,275.6 L 386.0,275.3 L 381.6,277.3 L 380.8,278.6 L 380.6,283.0 L 377.1,285.3 L 374.1,289.7 L 369.7,289.8 L 368.6,288.4 L 368.6,286.4 L 369.3,285.1 L 371.0,284.5 L 372.1,281.9 L 371.7,280.0 L 373.0,278.6 L 376.0,277.9 L 376.1,275.3 L 374.8,274.1 L 373.6,269.3 L 369.2,260.1 L 367.8,259.2 L 363.9,259.0 L 359.3,256.5 L 359.1,255.5 L 359.8,254.5 L 359.3,253.2 L 356.9,250.3 L 351.2,251.4 L 352.8,249.5 L 350.8,248.3 L 347.3,248.3 L 344.8,243.7 L 343.1,242.2 L 336.6,241.4 L 334.5,242.0 L 331.3,239.7 L 328.4,238.8 L 321.0,232.0 L 317.4,229.9 L 315.2,227.0 L 310.6,225.0 L 308.5,225.5 L 308.0,225.1 L 309.1,224.5 L 308.9,223.4 L 304.0,219.5 L 302.8,217.6 L 300.2,217.1 L 300.3,213.7 L 297.6,209.3 L 295.8,203.0 L 283.9,197.6 L 276.9,196.1 L 274.0,197.2 L 266.7,204.0 L 256.8,206.6 L 249.6,211.3 L 247.6,213.8 L 241.5,215.6 L 237.5,215.3 L 232.1,213.4 L 230.9,211.7 L 227.6,211.4 L 227.5,210.2 L 222.8,211.3 L 216.3,209.7 L 214.0,208.1 L 212.1,208.5 L 203.5,213.9 L 200.6,219.0 L 201.2,222.6 L 204.1,226.9 L 202.2,227.4 L 202.0,228.8 L 203.2,229.9 L 203.3,231.9 L 200.1,234.5 L 190.8,238.8 L 187.8,241.4 L 173.8,244.7 L 169.5,248.1 L 171.9,249.6 L 167.9,251.1 L 159.0,261.8 L 155.6,266.9 L 157.3,273.5 L 159.5,276.0 L 162.7,277.9 L 153.1,284.3 L 149.1,292.2 L 149.0,293.1 L 150.4,294.2 L 149.0,294.9 L 142.3,295.2 L 138.1,297.7 L 131.8,306.6 L 130.8,307.0 L 127.3,305.8 L 122.8,307.5 L 118.0,306.8 L 114.2,307.6 L 109.0,306.9 L 101.8,307.4 L 97.7,310.5 L 94.2,310.5 L 91.0,311.7 L 88.5,315.8 L 87.4,315.6 L 87.2,316.7 L 85.0,317.4 L 79.5,315.1 L 77.0,311.6 L 76.4,309.2 L 74.9,308.6 L 74.5,307.2 L 77.1,304.6 L 75.7,304.7 L 74.7,305.8 L 73.4,304.0 L 68.2,300.5 L 68.5,299.3 L 67.0,300.5 L 60.1,300.9 L 55.5,303.3 L 45.4,301.6 L 40.0,302.9 L 42.5,297.1 L 42.8,292.7 L 41.6,289.5 L 42.6,286.2 L 41.6,282.4 L 44.4,282.8 L 42.7,281.4 L 37.2,282.4 L 36.7,279.4 L 39.7,278.1 L 40.8,274.5 L 42.8,273.3 L 40.6,274.2 L 38.2,278.2 L 35.2,278.8 L 33.7,278.3 L 33.6,277.4 L 35.3,270.9 L 35.0,269.6 L 38.0,266.6 L 42.2,258.3 L 41.7,256.3 L 44.2,249.1 L 44.5,244.3 L 42.6,237.5 L 42.5,236.1 L 43.3,235.5 L 41.5,234.5 L 43.0,232.0 L 41.6,231.9 L 41.5,229.6 L 44.1,227.2 L 42.5,227.0 L 43.6,225.2 L 42.5,224.3 L 42.5,221.9 L 39.6,222.5 L 41.0,219.6 L 39.4,219.4 L 36.9,217.0 L 37.6,214.2 L 41.7,211.8 L 44.5,212.1 L 48.6,210.9 L 50.0,210.3 L 49.9,208.3 L 57.4,205.6 L 60.0,206.0 L 63.2,208.1 L 65.9,208.7 L 82.0,207.3 L 99.7,210.7 L 111.9,209.2 L 119.4,211.3 L 121.7,210.1 L 128.8,211.9 L 133.4,211.7 L 138.2,210.3 L 140.2,208.5 L 143.4,194.1 L 144.4,192.7 L 145.6,192.3 L 144.6,191.2 L 143.4,192.6 L 144.1,185.4 L 145.6,180.1 L 149.0,182.3 L 150.8,186.4 L 152.7,187.8 L 151.5,186.5 L 149.5,181.0 L 144.1,177.5 L 143.9,176.6 L 146.2,177.1 L 144.7,168.8 L 141.4,168.3 L 136.2,165.9 L 132.1,160.8 L 133.1,158.3 L 130.7,156.5 L 131.4,155.7 L 133.0,154.9 L 136.8,155.8 L 133.7,154.4 L 126.6,154.4 L 126.3,153.4 L 127.6,152.1 L 125.9,151.3 L 123.1,151.5 L 123.6,150.2 L 122.8,149.9 L 120.5,150.2 L 117.9,148.9 L 114.1,148.6 L 108.0,146.8 L 102.5,147.0 L 101.0,144.9 L 97.6,143.9 L 102.3,142.0 L 99.0,140.3 L 103.4,140.1 L 101.4,139.1 L 97.1,139.2 L 96.5,137.9 L 97.1,136.6 L 99.6,135.5 L 110.5,134.2 L 113.7,132.7 L 116.9,132.3 L 120.0,133.0 L 124.1,136.7 L 127.4,135.1 L 132.3,135.1 L 133.3,136.0 L 134.6,134.4 L 135.7,135.3 L 141.6,135.0 L 139.1,132.8 L 138.9,127.1 L 135.8,122.9 L 135.2,120.1 L 143.2,120.2 L 143.6,122.9 L 144.8,124.4 L 157.8,125.7 L 165.6,123.5 L 161.7,122.7 L 162.5,119.8 L 168.2,117.5 L 176.6,115.6 L 178.8,114.3 L 181.2,111.9 L 180.7,111.3 L 181.1,104.9 L 183.6,102.0 L 192.6,100.2 L 205.7,95.4 L 216.3,95.5 L 207.8,94.6 L 206.0,93.3 L 209.9,92.5 L 215.2,94.5 L 217.0,94.3 L 213.4,92.5 L 215.8,92.3 L 212.6,89.4 L 213.7,87.7 L 219.8,82.2 L 223.6,73.1 L 225.2,73.5 L 227.5,72.8 L 231.4,70.8 L 233.8,68.3 L 240.8,66.3 L 250.9,65.8 L 252.9,67.5 L 256.0,68.1 L 254.0,66.8 L 254.8,64.2 L 256.1,62.8 L 261.7,62.2 L 266.8,62.2 L 268.9,64.4 L 268.1,65.5 L 269.3,66.0 L 271.1,63.5 L 273.2,64.8 L 273.3,66.5 L 273.7,60.9 L 274.9,59.6 L 282.7,59.9 L 287.8,63.5 L 290.5,64.2 L 288.4,63.6 L 284.2,59.8 L 279.7,58.8 L 278.7,57.8 L 278.8,54.0 L 277.1,53.3 L 275.3,53.5 L 275.3,52.0 L 279.4,51.0 L 279.4,50.0 L 275.8,46.3 L 275.5,43.5 L 274.3,41.4 L 275.6,41.1 L 274.9,37.3 L 268.4,34.7 L 269.4,29.1 L 268.3,26.9 L 268.9,20.1 L 274.0,20.8 L 275.6,21.7 L 276.5,19.8 L 278.5,18.3 L 280.9,17.4 L 282.6,18.8 L 283.4,14.3 L 281.5,13.8 L 279.9,14.2 L 277.0,18.4 L 272.9,19.3 L 270.2,18.0 L 270.2,17.1 L 274.9,12.8 L 285.8,11.9 L 292.8,6.1 L 296.8,5.5 L 300.4,3.8 L 301.5,3.8 L 299.3,6.3 L 300.5,8.0 L 300.3,10.9 L 297.3,14.5 L 297.1,19.9 L 299.9,21.4 L 304.6,21.4 L 305.7,22.5 L 304.8,24.6 L 303.4,25.4 L 300.5,26.0 L 299.0,24.9 L 297.6,25.8 L 295.8,30.8 L 292.0,31.2 L 293.6,32.3 L 287.9,36.2 L 288.9,39.5 L 286.0,42.8 L 289.2,43.3 L 289.9,46.1 L 291.9,46.5 L 293.6,48.0 L 293.7,49.4 L 291.6,51.0 L 295.2,50.7 L 296.2,51.9 L 298.1,51.4 L 303.1,53.2 L 306.8,52.3 L 307.5,53.7 L 306.8,55.2 L 304.1,56.7 L 304.7,57.6 L 312.0,58.6 L 317.3,55.7 L 321.5,55.3 L 327.7,51.0 L 333.7,51.8 L 335.3,53.7 L 339.3,55.7 L 343.0,55.6 L 344.9,59.9 L 346.0,60.6 L 354.4,63.0 L 354.1,60.3 L 345.7,59.5 L 345.6,57.8 L 344.4,56.9 L 344.4,55.9 L 350.0,58.8 L 351.8,58.9 L 375.8,53.6 L 380.8,49.8 L 385.1,49.2 L 390.2,47.2 L 401.1,45.7 L 404.3,45.7 L 410.1,47.9 L 410.7,48.6 L 405.8,47.0 L 408.9,51.6 L 411.2,52.4 L 418.8,52.2 L 424.8,48.6 L 425.9,46.9 L 426.3,44.5 L 432.0,44.0 L 435.7,41.9 L 440.2,37.5 L 441.5,34.4 L 440.4,38.3 L 434.6,43.6 L 438.5,44.6 L 442.5,44.3 L 443.2,36.8 L 440.8,31.6 L 440.4,19.7 L 441.0,17.0 L 444.7,14.2 L 446.1,9.8 L 449.7,6.2 L 460.7,4.0 L 462.0,5.8 L 468.5,9.8 L 470.5,13.1 L 475.3,14.9 L 479.1,14.3 L 485.1,10.8 L 484.8,5.1 L 484.0,3.1 L 485.2,0.0 L 800.0,0.0 L 800.0,177.6 L 796.0,177.9 L 795.1,179.3 L 792.8,178.0 L 793.7,180.1 L 792.2,181.7 L 791.4,184.6 L 787.8,190.4 L 786.7,189.6 L 786.1,190.9 L 783.4,192.7 L 782.8,195.0 L 783.4,196.1 L 787.0,197.3 L 790.8,200.7 L 792.8,208.6 L 794.2,204.6 L 795.3,203.9 L 793.5,209.3 L 792.8,216.2 L 795.1,218.1 L 796.4,221.3 L 800.0,224.8 Z";
+
+const REGIONS = {"franks": {"name": "아헨", "x": 241.1, "y": 104.4}, "byzantium": {"name": "콘스탄티노폴리스", "x": 546.4, "y": 245.4}, "iberia": {"name": "코르도바", "x": 96.3, "y": 290.5}, "africa": {"name": "카이로", "x": 576.5, "y": 403.8}, "levant": {"name": "예루살렘", "x": 629.5, "y": 378.9}};
+
+const CONTROL_COLOR = {
+  neutral:'#B9AF9B', catholic:'#E3A73B', orthodox:'#3E7CC2',
+  islamic:'#20A879', pagan:'#8C7F68', arian:'#A868C9'
+};
+const CONTROL_LABEL = {
+  neutral:'미정', catholic:'로마 가톨릭권', orthodox:'그리스 정교권',
+  islamic:'이슬람권', pagan:'게르만 토속신앙권(가상)', arian:'아리우스파권(가상)'
+};
+
+/* =========================================================
+   배경 사실 (선택 대상 아님)
+   ========================================================= */
+const BACKGROUNDS = [
+  {
+    before:'p2',
+    text:'[역사적 배경] 7세기 이후 이슬람 세력은 북아프리카와 서아시아 대부분으로 빠르게 확장했어요. 실제로 있었던 일이며 선택의 대상이 아니에요.',
+    effects:[ {region:'africa', control:'islamic', strength:1}, {region:'levant', control:'islamic', strength:1} ]
+  }
+];
+
+/* =========================================================
+   결정 포인트 (시대순, 크리스트교 4 · 이슬람 4)
+   ========================================================= */
+const POINTS = [
+  { id:'p1', side:'christian', year:'4~5세기', title:'게르만 왕국들의 개종', region:'franks',
+    context:'서로마 제국이 무너진 자리에 여러 게르만 왕국이 들어섰어요. 그중 프랑크 왕국은 어떤 길을 택할까요?',
+    sourceNote:'교과서 근거(주제13): 프랑크 왕국은 로마 문화와 크리스트교를 일찍 받아들이며 다른 게르만 왕국들을 앞질러 성장했다.',
+    options:[
+      { label:'로마 가톨릭을 받아들이고 로마 문화와 결합한다', real:true, effect:{control:'catholic', strength:2},
+        result:'로마 교회와 손을 잡으며 서유럽에서 세력을 넓힐 발판을 마련했다.' },
+      { label:'게르만 고유의 토속 신앙을 지킨다', real:false, effect:{control:'pagan', strength:1},
+        result:'로마 교회의 지원을 받지 못해 다른 게르만 왕국들과 큰 차이가 없어졌다.' },
+      { label:'아리우스파 크리스트교를 받아들인다', real:false, effect:{control:'arian', strength:1},
+        result:'일부 게르만 왕국이 실제로 택했던 비주류 교파를 받아들여 로마 교회와는 거리가 생겼다.' }
+    ]
+  },
+  { id:'p2', side:'islam', year:'711년', title:'우마이야 왕조의 이베리아반도 정복', region:'iberia',
+    context:'우마이야 왕조가 지중해를 건너 유럽 쪽으로 세력을 넓히려 해요. 이베리아반도까지 진출할까요?',
+    sourceNote:'교과서 근거(주제13): 8세기 들어 우마이야 왕조가 바다를 건너 이베리아반도를 차지했다.',
+    options:[
+      { label:'지중해를 건너 이베리아반도를 정복한다', real:true, effect:{control:'islamic', strength:2},
+        result:'이베리아반도가 이슬람 세력권에 들어오며, 이후 유럽 진출의 발판이 됐다.' },
+      { label:'이베리아반도까지는 진출하지 않는다', real:false, effect:{control:'catholic', strength:1},
+        result:'가상: 서고트 왕국이 계속 이베리아반도를 다스렸다면, 이후 유럽의 세력 균형이 실제 역사와 크게 달라졌을 것이다.' }
+    ]
+  },
+  { id:'p3', side:'christian', year:'732년', title:'투르·푸아티에 전투', region:'franks',
+    context:'이슬람 세력이 이베리아반도를 넘어 서유럽 내륙까지 진출하려 해요. 프랑크 왕국의 재상 카롤루스 마르텔은 어떻게 대응할까요?',
+    sourceNote:'교과서 근거(주제13): 카롤루스 마르텔이 이슬람 세력을 물리치고 서유럽 크리스트교 세계를 지켜냈다.',
+    options:[
+      { label:'군대를 이끌고 맞서 싸운다', real:true, effect:{control:'catholic', strength:2},
+        result:'이슬람 세력의 진출을 막아내며 서유럽은 가톨릭 세력권으로 굳어졌다.' },
+      { label:'전면전을 피하고 후퇴한다', real:false, effect:{control:'islamic', strength:2},
+        result:'가상: 이슬람 세력이 서유럽 내륙까지 밀고 들어오며 프랑크 왕국 일부가 이슬람 영향권에 들어갔다.' }
+    ]
+  },
+  { id:'p4', side:'islam', year:'750년', title:'아바스 왕조의 등장', region:'levant',
+    context:'비아랍인을 차별하던 우마이야 왕조가 무너지고 아바스 왕조가 들어섰어요. 새 왕조는 이슬람 세계를 어떻게 다스릴까요?',
+    sourceNote:'교과서 근거(주제14): 아바스 왕조는 비아랍인도 관리로 등용하는 등 모든 이슬람교도를 동등하게 대했고, 그 결과 바그다드는 세계의 시장으로 번성했다.',
+    options:[
+      { label:'비아랍인도 관리로 등용하며 포용 정책을 편다', real:true, effect:{control:'islamic', strength:2, extraRegion:'africa'},
+        result:'비아랍인도 끌어안으며 바그다드를 중심으로 이슬람 세계가 더 넓고 다양하게 뻗어나갔다.' },
+      { label:'우마이야 왕조처럼 아랍인 중심 통치를 이어간다', real:false, effect:{control:'islamic', strength:0, extraRegion:'africa'},
+        result:'가상: 비아랍계의 불만이 쌓이며 이슬람 세계가 여러 갈래로 쪼개지는 속도가 빨라졌다.' }
+    ]
+  },
+  { id:'p5', side:'christian', year:'800년', title:'카롤루스 대제의 대관', region:'franks',
+    context:'카롤루스 대제가 서유럽 대부분을 정복하고 교회에 많은 땅을 바쳤어요. 교황은 그를 어떻게 대우할까요?',
+    sourceNote:'교과서 근거(주제13): 교황은 카롤루스 대제를 서로마 제국 황제로 임명했다(800). 비잔티움 제국은 이를 인정하지 않았다.',
+    options:[
+      { label:'교황이 카롤루스 대제를 서로마 황제로 임명한다', real:true, effect:{control:'catholic', strength:2},
+        result:'교황권과 세속 권력이 결합하며 서유럽에서 가톨릭의 정치적 힘이 굳건해졌다. 비잔티움 제국은 이 대관을 인정하지 않아 갈등의 불씨가 됐다.' },
+      { label:'대관을 하지 않고 프랑크 왕국을 세속 국가로 남긴다', real:false, effect:{control:'catholic', strength:1},
+        result:'가상: 교회와 세속 권력의 결합이 약해져 서유럽에서 교회의 정치적 영향력은 실제 역사보다 작았을 것이다.' }
+    ]
+  },
+  { id:'p6', side:'christian', year:'1054년', title:'동서 교회의 분열', region:'byzantium',
+    context:'성상 숭배를 둘러싼 갈등이 오랫동안 이어졌어요. 로마 교회와 비잔티움 교회는 어떤 길을 갈까요?',
+    sourceNote:'교과서 근거(주제13): 카롤루스 대제의 대관을 비잔티움 제국이 인정하지 않으며 동·서로마 교회의 갈등이 심해졌고, 결국 로마 가톨릭과 그리스 정교로 갈라섰다.',
+    options:[
+      { label:'갈등 끝에 로마 가톨릭과 그리스 정교로 갈라선다', real:true, effect:{control:'orthodox', strength:2},
+        result:'비잔티움은 그리스 정교의 중심이 되어 로마 가톨릭 세계와 다른 길을 걷게 됐다.' },
+      { label:'갈등을 봉합하고 하나의 교회로 남는다', real:false, effect:{control:'catholic', strength:1},
+        result:'가상: 로마와 콘스탄티노폴리스가 하나의 교회로 남았다면, 이후 서유럽과 비잔티움의 관계는 실제 역사와 크게 달랐을 것이다.' }
+    ]
+  },
+  { id:'p7', side:'islam', year:'1071년', title:'셀주크 튀르크의 확장', region:'levant',
+    context:'셀주크 튀르크가 비잔티움 제국을 압박하며 세력을 넓히고 있어요. 어떤 선택을 할까요?',
+    sourceNote:'교과서 근거(주제16): 셀주크 튀르크의 압박에 고전하던 비잔티움 제국이 교황에게 지원을 청했고, 이는 십자군 전쟁의 배경이 됐다(예루살렘 점령 1071).',
+    options:[
+      { label:'예루살렘을 비롯한 서아시아로 세력을 넓힌다', real:true, effect:{control:'islamic', strength:2},
+        result:'비잔티움이 위협을 느끼며 교황에게 도움을 청했고, 이는 훗날 십자군 전쟁의 배경이 됐다.' },
+      { label:'비잔티움과 우호 관계를 유지하며 확장을 자제한다', real:false, effect:{control:'islamic', strength:1},
+        result:'가상: 비잔티움이 큰 위협을 느끼지 않았다면, 교황에게 도움을 요청할 이유도 십자군을 소집할 명분도 약해졌을 것이다.' }
+    ]
+  },
+  { id:'p8', side:'islam', year:'1258년', title:'몽골의 바그다드 점령', region:'levant',
+    context:'몽골군이 서아시아까지 밀고 들어와 아바스 왕조의 수도 바그다드를 점령했어요. 이슬람 세계는 이 상황에 어떻게 대응할까요?',
+    sourceNote:'교과서 근거(주제16): 몽골인은 이슬람교를 허용했고 이후 개종한 지배층도 많아졌다. 이슬람 상인들은 몽골 제국의 안정된 교역망을 통해 더욱 활발히 무역했고, 이슬람 세계는 더 넓어졌다.',
+    options:[
+      { label:'몽골의 지배를 받아들이고, 이슬람으로 개종한 몽골 지배층과 함께 교역망을 넓힌다', real:true, effect:{control:'islamic', strength:1},
+        result:'바그다드는 무너졌지만 몽골 지배층이 이슬람교를 받아들이며, 안정된 교역망 속에서 이슬람 세계는 오히려 더 넓어졌다.' },
+      { label:'끝까지 저항한다', real:false, effect:{control:'islamic', strength:-1},
+        result:'가상: 끝까지 저항했다면 바그다드의 파괴는 더 컸고, 이슬람 세계의 회복은 실제 역사보다 느려졌을 것이다.' }
+    ]
+  }
+];
+
+/* =========================================================
+   상태
+   ========================================================= */
+let state = {
+  side:null, studentId:'', studentName:'',
+  regions:{}, log:[], stepIndex:0, timeline:[]
+};
+
+function freshRegions(){
+  const r = {};
+  Object.keys(REGIONS).forEach(id=>{ r[id] = {control:'neutral', strength:0}; });
+  return r;
+}
+
+function updateIdPreview(){
+  const g = document.getElementById('grade').value;
+  const c = document.getElementById('classNo').value;
+  const n = document.getElementById('numberNo').value;
+  const el = document.getElementById('idPreview');
+  if(g && c && n){
+    const code = g + String(c).padStart(2,'0') + String(n).padStart(2,'0');
+    el.textContent = '학번 코드: ' + code;
+    state.studentId = code;
+  } else {
+    el.textContent = '학번 코드: -';
+    state.studentId = '';
+  }
+}
+document.getElementById('grade').addEventListener('change', updateIdPreview);
+document.getElementById('classNo').addEventListener('input', updateIdPreview);
+document.getElementById('numberNo').addEventListener('input', updateIdPreview);
+
+function selectSide(side){
+  state.side = side;
+  document.getElementById('btnChristian').classList.toggle('selected', side==='christian');
+  document.getElementById('btnIslam').classList.toggle('selected', side==='islam');
+  document.getElementById('startBtn').disabled = false;
+  document.getElementById('sideBadge').textContent = side==='christian' ? '진영: 크리스트교 세계' : '진영: 이슬람 세계';
+}
+
+function buildTimeline(){
+  const tl = [];
+  POINTS.forEach(p=>{
+    const bg = BACKGROUNDS.find(b=>b.before===p.id);
+    if(bg) tl.push({type:'bg', data:bg});
+    tl.push({type:'point', data:p});
+  });
+  return tl;
+}
+
+function startGame(){
+  updateIdPreview();
+  state.studentName = document.getElementById('studentName').value.trim();
+  if(!state.studentId || state.studentId.length !== 5){
+    alert('학년/반/번호를 모두 입력해 주세요.');
+    return;
+  }
+  if(!state.studentName){
+    alert('이름을 입력해 주세요.');
+    return;
+  }
+  if(!state.side){
+    alert('진영을 선택해 주세요.');
+    return;
+  }
+  state.regions = freshRegions();
+  state.timeline = buildTimeline();
+  state.stepIndex = 0;
+  state.log = [];
+
+  document.getElementById('screen-setup').classList.add('hidden');
+  document.getElementById('screen-play').classList.remove('hidden');
+  renderStep();
+  renderMap('mapSvg', 'legend', state.regions);
+}
+
+function renderProgress(){
+  const bar = document.getElementById('progressBar');
+  bar.innerHTML='';
+  state.timeline.forEach((_, i)=>{
+    const d = document.createElement('div');
+    d.className = 'dot' + (i < state.stepIndex ? ' done' : i === state.stepIndex ? ' now' : '');
+    bar.appendChild(d);
+  });
+}
+
+function clampStrength(v){ return Math.max(0, Math.min(4, v)); }
+
+function applyEffect(regionId, effect, animate){
+  const r = state.regions[regionId];
+  r.control = effect.control;
+  r.strength = clampStrength(r.strength + effect.strength);
+  if(effect.extraRegion){
+    const r2 = state.regions[effect.extraRegion];
+    r2.control = effect.control;
+    r2.strength = clampStrength(r2.strength + effect.strength);
+  }
+}
+
+function renderStep(){
+  renderProgress();
+  const step = state.timeline[state.stepIndex];
+  const card = document.getElementById('stepCard');
+  if(!step){ goToSummary(); return; }
+
+  if(step.type === 'bg'){
+    card.innerHTML = `
+      <span class="tag bg">역사적 배경</span>
+      <p class="context">${step.data.text}</p>
+      <div class="actions"><button class="btn" onclick="advanceBackground()">계속하기</button></div>`;
+    return;
+  }
+
+  const p = step.data;
+  const isPlayerChoice = (p.side === state.side);
+  const tagClass = p.side === 'christian' ? 'christian' : 'islamic';
+  const tagText = p.side === 'christian' ? '크리스트교 세계' : '이슬람 세계';
+
+  let optionsHtml = '';
+  p.options.forEach((opt, idx)=>{
+    optionsHtml += `<button class="option" id="opt-${idx}" onclick="choose(${idx})" ${isPlayerChoice ? '' : 'disabled'}>${opt.label}</button>`;
+  });
+
+  card.innerHTML = `
+    <span class="tag ${tagClass}">${tagText}${isPlayerChoice ? '' : ' · 자동 진행'}</span>
+    <div class="year">${p.year}</div>
+    <div class="title">${p.title}</div>
+    <p class="context">${p.context}</p>
+    <div class="source-note">${p.sourceNote}</div>
+    ${isPlayerChoice ? optionsHtml : `<button class="btn" onclick="autoResolve()">사건 확인하기</button>`}
+    <div id="resultArea"></div>`;
+}
+
+function choose(idx){
+  const step = state.timeline[state.stepIndex];
+  const p = step.data;
+  const opt = p.options[idx];
+
+  document.querySelectorAll('.option').forEach((el,i)=>{
+    el.disabled = true;
+    if(i===idx) el.classList.add('picked');
+  });
+
+  applyEffect(p.region, opt.effect);
+  renderMap('mapSvg', 'legend', state.regions, p.region);
+
+  state.log.push({ id:p.id, year:p.year, title:p.title, chosenLabel:opt.label, real:opt.real, result:opt.result });
+
+  document.getElementById('resultArea').innerHTML = `
+    <div class="result-box">
+      ${opt.real ? '' : '<span class="flag">⚡ 가상 선택 — 실제 역사와 다른 경로입니다</span>'}
+      ${opt.result}
+    </div>
+    <div class="actions"><button class="btn" onclick="nextStep()">다음으로</button></div>`;
+}
+
+function autoResolve(){
+  const step = state.timeline[state.stepIndex];
+  const p = step.data;
+  const realOpt = p.options.find(o=>o.real);
+  applyEffect(p.region, realOpt.effect);
+  renderMap('mapSvg', 'legend', state.regions, p.region);
+
+  state.log.push({ id:p.id, year:p.year, title:p.title, chosenLabel:realOpt.label + '(실제 역사)', real:true, result:realOpt.result, auto:true });
+
+  document.getElementById('stepCard').insertAdjacentHTML('beforeend', `
+    <div class="result-box">${realOpt.result}</div>
+    <div class="actions"><button class="btn" onclick="nextStep()">다음으로</button></div>`);
+}
+
+function advanceBackground(){
+  const step = state.timeline[state.stepIndex];
+  step.data.effects.forEach(e=>applyEffect(e.region, {control:e.control, strength:e.strength}));
+  renderMap('mapSvg', 'legend', state.regions);
+  nextStep();
+}
+
+function nextStep(){ state.stepIndex++; renderStep(); }
+
+/* =========================================================
+   지도 렌더링 — 실제 해안선 + 거점 버블(halo+marker)
+   ========================================================= */
+function renderMap(svgId, legendId, regionsState, pulseRegion){
+  const svg = document.getElementById(svgId);
+  svg.innerHTML = '';
+
+  const sea = document.createElementNS('http://www.w3.org/2000/svg','rect');
+  sea.setAttribute('x','0'); sea.setAttribute('y','0');
+  sea.setAttribute('width','800'); sea.setAttribute('height','520');
+  sea.setAttribute('class','sea');
+  svg.appendChild(sea);
+
+  const land = document.createElementNS('http://www.w3.org/2000/svg','path');
+  land.setAttribute('d', LAND_PATH);
+  land.setAttribute('class','land');
+  svg.appendChild(land);
+
+  Object.keys(REGIONS).forEach(id=>{
+    const c = REGIONS[id];
+    const rs = regionsState[id];
+    const color = CONTROL_COLOR[rs.control] || CONTROL_COLOR.neutral;
+    const haloR = 34 + rs.strength * 15;
+    const markerR = 9 + rs.strength * 4.2;
+
+    const halo = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    halo.setAttribute('cx', c.x); halo.setAttribute('cy', c.y);
+    halo.setAttribute('r', haloR);
+    halo.setAttribute('fill', color);
+    halo.setAttribute('opacity', (0.10 + rs.strength*0.05).toFixed(2));
+    halo.setAttribute('class','halo');
+    svg.appendChild(halo);
+
+    const bubble = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    bubble.setAttribute('cx', c.x); bubble.setAttribute('cy', c.y);
+    bubble.setAttribute('r', markerR);
+    bubble.setAttribute('fill', color);
+    bubble.setAttribute('class','bubble' + (pulseRegion===id ? ' pulse' : ''));
+    svg.appendChild(bubble);
+
+    const label = document.createElementNS('http://www.w3.org/2000/svg','text');
+    label.setAttribute('x', c.x);
+    label.setAttribute('y', c.y - markerR - 8);
+    label.setAttribute('text-anchor','middle');
+    label.setAttribute('class','region-label');
+    label.textContent = c.name;
+    svg.appendChild(label);
+  });
+
+  const legend = document.getElementById(legendId);
+  if(legend){
+    legend.innerHTML = '';
+    const seen = new Set();
+    Object.values(regionsState).forEach(rs=>seen.add(rs.control));
+    const order = ['catholic','orthodox','islamic','pagan','arian','neutral'];
+    order.filter(c=>seen.has(c)).forEach(c=>{
+      legend.insertAdjacentHTML('beforeend', `<span><span class="swatch" style="background:${CONTROL_COLOR[c]}"></span>${CONTROL_LABEL[c]}</span>`);
+    });
+  }
+}
+
+/* =========================================================
+   실제 역사 최종 상태
+   ========================================================= */
+function computeRealHistory(){
+  const r = freshRegions();
+  BACKGROUNDS.forEach(bg=>{
+    bg.effects.forEach(e=>{
+      r[e.region].control = e.control;
+      r[e.region].strength = clampStrength(r[e.region].strength + e.strength);
+    });
+  });
+  POINTS.forEach(p=>{
+    const realOpt = p.options.find(o=>o.real);
+    r[p.region].control = realOpt.effect.control;
+    r[p.region].strength = clampStrength(r[p.region].strength + realOpt.effect.strength);
+    if(realOpt.effect.extraRegion){
+      r[realOpt.effect.extraRegion].control = realOpt.effect.control;
+      r[realOpt.effect.extraRegion].strength = clampStrength(r[realOpt.effect.extraRegion].strength + realOpt.effect.strength);
+    }
+  });
+  return r;
+}
+
+/* =========================================================
+   요약 화면
+   ========================================================= */
+function goToSummary(){
+  document.getElementById('screen-play').classList.add('hidden');
+  document.getElementById('screen-summary').classList.remove('hidden');
+
+  renderMap('mapSvgMine', 'legend2', state.regions);
+  const realState = computeRealHistory();
+  renderMap('mapSvgReal', null, realState);
+
+  const diffList = document.getElementById('diffList');
+  diffList.innerHTML = '';
+  let diffCount = 0;
+  Object.keys(REGIONS).forEach(id=>{
+    const mine = state.regions[id].control;
+    const real = realState[id].control;
+    const div = document.createElement('div');
+    if(mine === real){
+      div.className = 'diff-item same';
+      div.textContent = `${REGIONS[id].name}: 실제 역사와 동일 (${CONTROL_LABEL[real]})`;
+    } else {
+      diffCount++;
+      div.className = 'diff-item diff';
+      div.textContent = `${REGIONS[id].name}: 나는 "${CONTROL_LABEL[mine]}"을 선택 → 실제 역사는 "${CONTROL_LABEL[real]}". 왜 실제 역사는 이렇게 흘러갔을까?`;
+    }
+    diffList.appendChild(div);
+  });
+  if(diffCount === 0){
+    diffList.insertAdjacentHTML('afterbegin', `<div class="diff-item allsame">모든 지역이 실제 역사와 같은 방향으로 갔어요 — 그럴 만한 이유가 있었던 선택을 골랐다는 뜻이에요.</div>`);
+  }
+}
+
+/* =========================================================
+   제출
+   ========================================================= */
+async function submitResult(){
+  const reflection = document.getElementById('reflection').value.trim();
+  if(reflection.length < 5){
+    alert('한두 문장으로 생각을 남겨줘.');
+    return;
+  }
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.textContent = '전송 중...';
+
+  const choiceSummary = state.log.filter(l=>!l.auto).map(l=>`${l.year}: ${l.chosenLabel}`).join(' / ') || '선택 없음';
+
+  const realState = computeRealHistory();
+  const diffs = Object.keys(REGIONS)
+    .filter(id => state.regions[id].control !== realState[id].control)
+    .map(id => `${REGIONS[id].name}(나:${CONTROL_LABEL[state.regions[id].control]}→실제:${CONTROL_LABEL[realState[id].control]})`);
+  const diffSummary = diffs.length ? diffs.join(', ') : '모두 실제 역사와 동일';
+
+  const choicesDetail = state.log.map(l => ({ id:l.id, year:l.year, title:l.title, real:l.real, auto:!!l.auto }));
+
+  const payload = {
+    studentId: state.studentId, studentName: state.studentName,
+    choiceSummary, diffSummary, reflection,
+    choicesJson: JSON.stringify(choicesDetail)
+  };
+
+  const statusEl = document.getElementById('submitStatus');
+  if(!CONFIG.SHEET_WEBAPP_URL){
+    statusEl.textContent = '⚠ 아직 스프레드시트 연동 주소가 설정되지 않았어요. (선생님 확인 필요)';
+    btn.disabled = false; btn.textContent = '결과 제출하기';
+    return;
+  }
+  try{
+    await fetch(CONFIG.SHEET_WEBAPP_URL, {
+      method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(payload)
+    });
+    document.getElementById('screen-summary').classList.add('hidden');
+    document.getElementById('screen-done').classList.remove('hidden');
+  }catch(err){
+    statusEl.textContent = '⚠ 전송 중 문제가 발생했어요. 다시 시도해 주세요.';
+    btn.disabled = false; btn.textContent = '결과 제출하기';
+  }
+}
+
+/* =========================================================
+   교사용 대시보드
+   ========================================================= */
+function openTeacherGate(){
+  document.getElementById('teacherModal').classList.remove('hidden');
+  document.getElementById('teacherPw').value = '';
+  document.getElementById('teacherPw').focus();
+}
+function closeTeacherGate(){ document.getElementById('teacherModal').classList.add('hidden'); }
+
+function checkTeacherPw(){
+  const pw = document.getElementById('teacherPw').value;
+  if(pw === CONFIG.TEACHER_PASSWORD){
+    closeTeacherGate();
+    enterDashboard();
+  } else {
+    alert('비밀번호가 올바르지 않아요.');
+  }
+}
+
+async function enterDashboard(){
+  ['screen-setup','screen-play','screen-summary','screen-done'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+  document.getElementById('screen-dashboard').classList.remove('hidden');
+  document.getElementById('dashStats').innerHTML = '<p class="small">불러오는 중...</p>';
+  document.getElementById('dashBars').innerHTML = '';
+  document.getElementById('dashTable').innerHTML = '';
+
+  if(!CONFIG.SHEET_WEBAPP_URL){
+    document.getElementById('dashStats').innerHTML = '<p class="small">⚠ 스프레드시트 연동 주소가 설정되지 않았어요.</p>';
+    return;
+  }
+
+  try{
+    const res = await fetch(`${CONFIG.SHEET_WEBAPP_URL}?token=${encodeURIComponent(CONFIG.TEACHER_PASSWORD)}`);
+    const rows = await res.json();
+    renderDashboard(rows.rows || rows);
+  }catch(err){
+    document.getElementById('dashStats').innerHTML = '<p class="small">⚠ 데이터를 불러오지 못했어요.</p>';
+  }
+}
+
+function renderDashboard(rows){
+  document.getElementById('dashStats').innerHTML = `
+    <div class="stat-grid">
+      <div class="stat-box"><div class="num">${rows.length}</div><div class="lab">제출 인원</div></div>
+      <div class="stat-box"><div class="num">${state.side==='christian'?'':''}${POINTS.length}</div><div class="lab">전체 결정 포인트</div></div>
+      <div class="stat-box"><div class="num">${rows.filter(r=>r.diffSummary && r.diffSummary!=='모두 실제 역사와 동일').length}</div><div class="lab">실제 역사와 다른 선택을 한 학생</div></div>
+    </div>`;
+
+  const bars = document.getElementById('dashBars');
+  bars.innerHTML = '';
+  POINTS.forEach(p=>{
+    let realCount=0, altCount=0;
+    rows.forEach(r=>{
+      try{
+        const detail = JSON.parse(r.choicesJson || '[]');
+        const hit = detail.find(d=>d.id===p.id && !d.auto);
+        if(hit){ hit.real ? realCount++ : altCount++; }
+      }catch(e){}
+    });
+    const total = realCount+altCount;
+    const realPct = total ? (realCount/total*100) : 0;
+    const altPct = total ? (altCount/total*100) : 0;
+    bars.insertAdjacentHTML('beforeend', `
+      <div class="bar-row">
+        <div class="bar-label">${p.year} · ${p.title}</div>
+        <div class="bar-track">
+          <div class="bar-real" style="width:${realPct}%"></div>
+          <div class="bar-alt" style="width:${altPct}%"></div>
+        </div>
+        <div class="bar-caption">실제 역사 선택 ${realCount}명 · 가상 선택 ${altCount}명 ${total===0?'(직접 선택한 학생 없음 — 반대 진영에서는 자동 진행)':''}</div>
+      </div>`);
+  });
+
+  const table = document.getElementById('dashTable');
+  let html = '<tr><th>학번</th><th>이름</th><th>선택 요약</th><th>실제 역사와의 차이</th><th>한 줄 남기기</th></tr>';
+  rows.forEach(r=>{
+    html += `<tr><td>${r.studentId||''}</td><td>${r.studentName||''}</td><td>${r.choiceSummary||''}</td><td>${r.diffSummary||''}</td><td>${r.reflection||''}</td></tr>`;
+  });
+  table.innerHTML = html;
+}
+
+function exitDashboard(){
+  document.getElementById('screen-dashboard').classList.add('hidden');
+  document.getElementById('screen-setup').classList.remove('hidden');
+}
+</script>
+</body>
+</html>
