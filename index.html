@@ -49,7 +49,7 @@
     min-height:100vh;
   }
   h1,h2,h3,.display{ font-family:'Nanum Myeongjo', serif; color:var(--ink); margin:0; }
-  .wrap{ max-width:980px; margin:0 auto; padding:22px 18px 70px; }
+  .wrap{ max-width:1180px; margin:0 auto; padding:22px 18px 70px; }
 
   header.top{
     display:flex; align-items:center; justify-content:space-between;
@@ -110,6 +110,10 @@
   .side-btn.islam .name{ color:var(--islamic-deep); }
   .side-btn .desc{ font-size:14px; color:var(--ink-soft); }
 
+  .btn, .option, .side-btn{
+    touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+    user-select:none; -webkit-user-select:none;
+  }
   .btn{
     display:inline-flex; align-items:center; justify-content:center; gap:8px;
     cursor:pointer; border:none; border-radius:12px; padding:14px 24px;
@@ -123,6 +127,17 @@
   .btn.ghost:hover{ background:var(--paper-deep); color:var(--ink); }
   .btn.small{ padding:9px 16px; min-height:38px; font-size:14px; }
   .actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:18px; flex-wrap:wrap; }
+
+  /* play layout — 태블릿 가로에서 지도(좌) + 사건 카드(우) */
+  .play-grid{
+    display:grid; grid-template-columns: minmax(0, 11fr) minmax(0, 10fr);
+    gap:18px; align-items:start;
+  }
+  .play-grid .map-panel{ position:sticky; top:12px; margin-bottom:0; }
+  @media (max-width:880px){
+    .play-grid{ grid-template-columns:1fr; }
+    .play-grid .map-panel{ position:static; margin-bottom:16px; }
+  }
 
   /* map */
   .map-panel{
@@ -179,6 +194,13 @@
     border-radius:14px; padding:15px 17px;
   }
   .result-box .flag{ font-size:12.5px; font-weight:800; color:var(--danger); margin-bottom:5px; display:block; }
+  .result-box .auto-label{ font-size:12.5px; font-weight:800; color:var(--gold-deep); margin-bottom:5px; display:block; }
+
+  /* 자동 진행(선택 불가) 사건 카드 — 선택 화면과 시각적으로 구분 */
+  .card.auto-card{
+    background:linear-gradient(180deg, #FBF7EC, #F8F2E2);
+    border-left:6px solid var(--gold);
+  }
 
   .maps-compare{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
   @media (max-width:640px){ .maps-compare{grid-template-columns:1fr;} }
@@ -295,13 +317,15 @@
   <div id="screen-play" class="hidden">
     <div class="progress" id="progressBar"></div>
 
-    <div class="map-panel">
-      <h3>현재 세력권 지도</h3>
-      <svg class="gamemap" id="mapSvg" viewBox="0 0 800 520" xmlns="http://www.w3.org/2000/svg"></svg>
-      <div class="legend" id="legend"></div>
-    </div>
+    <div class="play-grid">
+      <div class="map-panel">
+        <h3>현재 세력권 지도</h3>
+        <svg class="gamemap" id="mapSvg" viewBox="0 0 800 520" xmlns="http://www.w3.org/2000/svg"></svg>
+        <div class="legend" id="legend"></div>
+      </div>
 
-    <div class="card" id="stepCard"></div>
+      <div class="card" id="stepCard"></div>
+    </div>
   </div>
 
   <!-- SUMMARY -->
@@ -392,7 +416,7 @@
    ========================================================= */
 const CONFIG = {
   SHEET_WEBAPP_URL: "https://script.google.com/macros/s/AKfycbwVeNR7iBW-tVna51ZcxZXJpWoC5Hl1COJ9TXHrBCwDDkUVqIftw5olqtXRXWeX-QU5bg/exec",       // Apps Script 배포 후 웹앱 URL을 넣으세요
-  TEACHER_PASSWORD: "history2026", // 
+  TEACHER_PASSWORD: "his26", // 교사용 화면 진입 비밀번호 (화면단 보호 — 원할 시 자유롭게 바꾸세요)
 };
 
 /* =========================================================
@@ -615,11 +639,18 @@ function renderStep(){
   const card = document.getElementById('stepCard');
   if(!step){ goToSummary(); return; }
 
+  /* --- 역사적 배경: 효과 즉시 적용, 카드 1개 + 버튼 1개 --- */
   if(step.type === 'bg'){
+    if(!step.done){
+      step.done = true;
+      step.data.effects.forEach(e=>applyEffect(e.region, {control:e.control, strength:e.strength}));
+      renderMap('mapSvg', 'legend', state.regions);
+    }
+    card.classList.add('auto-card');
     card.innerHTML = `
-      <span class="tag bg">역사적 배경</span>
+      <span class="tag bg">역사적 배경 · 자동 진행</span>
       <p class="context">${step.data.text}</p>
-      <div class="actions"><button class="btn" onclick="advanceBackground()">계속하기</button></div>`;
+      <div class="actions"><button class="btn" onclick="nextStep(this)">다음으로</button></div>`;
     return;
   }
 
@@ -628,23 +659,52 @@ function renderStep(){
   const tagClass = p.side === 'christian' ? 'christian' : 'islamic';
   const tagText = p.side === 'christian' ? '크리스트교 세계' : '이슬람 세계';
 
+  /* --- 반대 진영 사건: 실제 역사 자동 적용, 결과까지 한 화면 + 버튼 1개 --- */
+  if(!isPlayerChoice){
+    const realOpt = p.options.find(o=>o.real);
+    if(!step.done){
+      step.done = true;
+      applyEffect(p.region, realOpt.effect);
+      renderMap('mapSvg', 'legend', state.regions, p.region);
+      state.log.push({ id:p.id, year:p.year, title:p.title, chosenLabel:realOpt.label + '(실제 역사)', real:true, result:realOpt.result, auto:true });
+    }
+    card.classList.add('auto-card');
+    card.innerHTML = `
+      <span class="tag ${tagClass}">${tagText} · 자동 진행</span>
+      <div class="year">${p.year}</div>
+      <div class="title">${p.title}</div>
+      <p class="context">${p.context}</p>
+      <div class="source-note">${p.sourceNote}</div>
+      <div class="result-box">
+        <span class="auto-label">📜 실제 역사 — ${realOpt.label}</span>
+        ${realOpt.result}
+      </div>
+      <div class="actions"><button class="btn" onclick="nextStep(this)">다음으로</button></div>`;
+    return;
+  }
+
+  /* --- 내 진영 사건: 선택지 제시 --- */
+  card.classList.remove('auto-card');
   let optionsHtml = '';
   p.options.forEach((opt, idx)=>{
-    optionsHtml += `<button class="option" id="opt-${idx}" onclick="choose(${idx})" ${isPlayerChoice ? '' : 'disabled'}>${opt.label}</button>`;
+    optionsHtml += `<button class="option" id="opt-${idx}" onclick="choose(${idx})">${opt.label}</button>`;
   });
 
   card.innerHTML = `
-    <span class="tag ${tagClass}">${tagText}${isPlayerChoice ? '' : ' · 자동 진행'}</span>
+    <span class="tag ${tagClass}">${tagText}</span>
     <div class="year">${p.year}</div>
     <div class="title">${p.title}</div>
     <p class="context">${p.context}</p>
     <div class="source-note">${p.sourceNote}</div>
-    ${isPlayerChoice ? optionsHtml : `<button class="btn" onclick="autoResolve()">사건 확인하기</button>`}
+    ${optionsHtml}
     <div id="resultArea"></div>`;
 }
 
 function choose(idx){
   const step = state.timeline[state.stepIndex];
+  if(step.done) return;           // 연타·중복 선택 방지
+  step.done = true;
+
   const p = step.data;
   const opt = p.options[idx];
 
@@ -663,31 +723,14 @@ function choose(idx){
       ${opt.real ? '' : '<span class="flag">⚡ 가상 선택 — 실제 역사와 다른 경로입니다</span>'}
       ${opt.result}
     </div>
-    <div class="actions"><button class="btn" onclick="nextStep()">다음으로</button></div>`;
+    <div class="actions"><button class="btn" onclick="nextStep(this)">다음으로</button></div>`;
 }
 
-function autoResolve(){
-  const step = state.timeline[state.stepIndex];
-  const p = step.data;
-  const realOpt = p.options.find(o=>o.real);
-  applyEffect(p.region, realOpt.effect);
-  renderMap('mapSvg', 'legend', state.regions, p.region);
-
-  state.log.push({ id:p.id, year:p.year, title:p.title, chosenLabel:realOpt.label + '(실제 역사)', real:true, result:realOpt.result, auto:true });
-
-  document.getElementById('stepCard').insertAdjacentHTML('beforeend', `
-    <div class="result-box">${realOpt.result}</div>
-    <div class="actions"><button class="btn" onclick="nextStep()">다음으로</button></div>`);
+function nextStep(btn){
+  if(btn) btn.disabled = true;    // 연타 방지: 누르는 즉시 잠금
+  state.stepIndex++;
+  renderStep();
 }
-
-function advanceBackground(){
-  const step = state.timeline[state.stepIndex];
-  step.data.effects.forEach(e=>applyEffect(e.region, {control:e.control, strength:e.strength}));
-  renderMap('mapSvg', 'legend', state.regions);
-  nextStep();
-}
-
-function nextStep(){ state.stepIndex++; renderStep(); }
 
 /* =========================================================
    지도 렌더링 — 실제 해안선 + 거점 버블(halo+marker)
