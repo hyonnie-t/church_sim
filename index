@@ -391,8 +391,8 @@
    CONFIG
    ========================================================= */
 const CONFIG = {
-  SHEET_WEBAPP_URL: "",       // Apps Script 배포 후 웹앱 URL을 넣으세요
-  TEACHER_PASSWORD: "history2026", // 교사용 화면 진입 비밀번호 (화면단 보호 — 원할 시 자유롭게 바꾸세요)
+  SHEET_WEBAPP_URL: "https://script.google.com/macros/s/AKfycbwVeNR7iBW-tVna51ZcxZXJpWoC5Hl1COJ9TXHrBCwDDkUVqIftw5olqtXRXWeX-QU5bg/exec",       // Apps Script 배포 후 웹앱 URL을 넣으세요
+  TEACHER_PASSWORD: "history2026", // 
 };
 
 /* =========================================================
