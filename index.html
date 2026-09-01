@@ -1127,12 +1127,21 @@ async function submitResult(){
     return;
   }
   try{
-    await fetch(CONFIG.SHEET_WEBAPP_URL, {
+    const res = await fetch(CONFIG.SHEET_WEBAPP_URL, {
       method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(payload)
     });
+    if(!res.ok){
+      throw new Error(`서버 응답 오류 (status ${res.status})`);
+    }
+    const json = await res.json();
+    if(!json || json.result !== 'success'){
+      throw new Error((json && json.message) || '백엔드가 저장 실패를 반환함');
+    }
+    statusEl.textContent = '';
     document.getElementById('screen-summary').classList.add('hidden');
     document.getElementById('screen-done').classList.remove('hidden');
   }catch(err){
+    console.log('전송 실패:', err);
     statusEl.textContent = '⚠ 전송 중 문제가 발생했어요. 다시 시도해 주세요.';
     btn.disabled = false; btn.textContent = '결과 제출하기';
   }
