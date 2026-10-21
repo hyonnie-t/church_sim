@@ -530,7 +530,7 @@
    ========================================================= */
 const CONFIG = {
   SHEET_WEBAPP_URL: "https://script.google.com/macros/s/AKfycbyXSjCfWY_HiZFqW_OBR-FQDoIfF1z_STqyKWUI31MacHeY3u7hbirFSFDvW-5yuUHaJQ/exec",       // Apps Script 배포 후 웹앱 URL을 넣으세요 (마스터 시트 하나에 여러 게임이 배포 URL을 공유)
-  TEACHER_PASSWORD: "his26", // 교사용 화면 진입 비밀번호 (화면단 보호 — 원할 시 자유롭게 바꾸세요)
+  TEACHER_PASSWORD: "", // v83: 교사 토큰을 공개 레포에 두지 않는다 — 교사용 화면에서 매번 입력한 값을 그대로 백엔드 토큰으로 쓴다
   GAME_NAME: "세력권전략시뮬레이션", // 마스터 시트 "게임명" 컬럼에 들어가는 고정값 — 게임마다 다르게 설정
   PORTAL_URL: "https://hyonnie-t.github.io/history26/", // 학습 포털 복귀 주소 (학번·이름을 붙여 자동 로그인)
   MIN_REFLECTION: 20, // 성찰 최소 글자 수
@@ -1157,14 +1157,14 @@ function openTeacherGate(){
 }
 function closeTeacherGate(){ document.getElementById('teacherModal').classList.add('hidden'); }
 
+let TEACHER_TOKEN_INPUT = '';
 function checkTeacherPw(){
-  const pw = document.getElementById('teacherPw').value;
-  if(pw === CONFIG.TEACHER_PASSWORD){
-    closeTeacherGate();
-    enterDashboard();
-  } else {
-    alert('비밀번호가 올바르지 않아요.');
-  }
+  const pw = document.getElementById('teacherPw').value.trim();
+  if(!pw){ alert('비밀번호를 입력해 주세요.'); return; }
+  // v83 — 화면에서 비교하지 않고 백엔드가 토큰을 확인한다(틀리면 enterDashboard가 안내).
+  TEACHER_TOKEN_INPUT = pw;
+  closeTeacherGate();
+  enterDashboard();
 }
 
 async function enterDashboard(){
@@ -1180,8 +1180,12 @@ async function enterDashboard(){
   }
 
   try{
-    const res = await fetch(`${CONFIG.SHEET_WEBAPP_URL}?token=${encodeURIComponent(CONFIG.TEACHER_PASSWORD)}&game=${encodeURIComponent(CONFIG.GAME_NAME)}`);
+    const res = await fetch(`${CONFIG.SHEET_WEBAPP_URL}?token=${encodeURIComponent(TEACHER_TOKEN_INPUT)}&game=${encodeURIComponent(CONFIG.GAME_NAME)}`);
     const rows = await res.json();
+    if(rows && rows.result === 'error'){ // v83 — 토큰이 틀리면 백엔드가 인증 실패를 돌려준다
+      document.getElementById('dashStats').innerHTML = '<p class="small">⚠ 비밀번호가 올바르지 않아요.</p>';
+      return;
+    }
     dashAllRows = rows.rows || rows;
     buildBanFilter(dashAllRows);
     applyBanFilter();
